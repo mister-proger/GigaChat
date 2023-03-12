@@ -55,6 +55,8 @@ def recv_connect():
 
         try:
 
+            print(data)
+
             if data.get('all', False):
 
                 edit_data = str(datetime.datetime.now()) + ' ' + data['sender'] + ': ' + data['text']
@@ -126,11 +128,11 @@ def start_connect():
 
     window_chat('----- CONNECT {' + input_str_server_mask.get() + '} -----')
 
-    recv_connect = threading.Thread(target=recv_connect)
+    connection.send(input_str_mask.get().encode())
+
+    recv_connect = threading.Thread(target = recv_connect)
 
     recv_connect.start()
-
-    connection.send(input_str_mask.get().encode())
 
     status = True
 
