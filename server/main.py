@@ -48,8 +48,6 @@ def handle_client(connection, addr):
 
                 print(str(datetime.datetime.now()), mask, 'отключился')
 
-                del clients[mask]
-
                 for c in clients.keys():
 
                     clients[c].send(json.dumps({

@@ -89,10 +89,11 @@ def send_mess(event = None):
 
 def start_connect():
 
+    global recv_connect
+
     global status
 
     status = False
-
 
     HOST = input_str_HOST.get()
 
@@ -105,8 +106,6 @@ def start_connect():
         window_chat('----- ERROR PORT | ' + input_str_PORT.get() + ' -----')
 
         return None
-
-    mask = input_str_mask.get()
 
 
     global connection
@@ -127,11 +126,11 @@ def start_connect():
 
     window_chat('----- CONNECT {' + input_str_server_mask.get() + '} -----')
 
-    connection.send(input_str_mask.get().encode())
-
-    recv_connect = threading.Thread(target = recv_connect)
+    recv_connect = threading.Thread(target=recv_connect)
 
     recv_connect.start()
+
+    connection.send(input_str_mask.get().encode())
 
     status = True
 

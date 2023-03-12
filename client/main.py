@@ -81,7 +81,7 @@ def send_mess(event = None):
 
     else:
 
-        connection.send(input_str.get().encode())
+        connection.sendall(input_str.get().encode())
 
         input_str.delete(0, 'end')
 
@@ -89,40 +89,11 @@ def send_mess(event = None):
 
 def start_connect():
 
-    global connection
+    global recv_connect
 
     global status
 
-    def recv_connect():
-
-        global connection
-
-        global status
-
-        while status:
-
-            data = json.loads(connection.recv(1024).decode())
-
-            try:
-
-                if data.get('all', False):
-
-                    edit_data = str(datetime.datetime.now()) + ' ' + data['sender'] + ': ' + data['text']
-
-                else:
-
-                    edit_data = str(datetime.datetime.now()) + ' ' + data['sender'] + ' -> You: ' + data['text']
-
-            except:
-
-                edit_data = str(datetime.datetime.now()) + ' Не удалось получить сообщение'
-
-            window_chat(edit_data)
-
-
-
     status = False
-
 
     HOST = input_str_HOST.get()
 
@@ -136,11 +107,8 @@ def start_connect():
 
         return None
 
-    mask = input_str_mask.get()
-
 
     global connection
-
 
 
     connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -153,19 +121,18 @@ def start_connect():
 
         window_chat('----- ERROR CONNECT {' + input_str_server_mask.get() + '} | Ошибка данных подключения -----')
 
-    else:
-
-        window_chat('----- CONNECT {' + input_str_server_mask.get() + '} -----')
-
-        connection.send(input_str_mask.get().encode())
-
-        recv_connect = threading.Thread(target = recv_connect)
-
-        recv_connect.start()
-
-        status = True
+        return None
 
 
+    window_chat('----- CONNECT {' + input_str_server_mask.get() + '} -----')
+
+    connection.send(input_str_mask.get().encode())
+
+    recv_connect = threading.Thread(target = recv_connect)
+
+    recv_connect.start()
+
+    status = True
 
 
 
