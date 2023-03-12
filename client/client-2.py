@@ -89,32 +89,6 @@ def send_mess(event = None):
 
 def start_connect():
 
-    def recv_connect():
-
-        global connection
-
-        global status
-
-        while status:
-
-            data = json.loads(connection.recv(1024).decode())
-
-            try:
-
-                if data.get('all', False):
-
-                    edit_data = str(datetime.datetime.now()) + ' ' + data['sender'] + ': ' + data['text']
-
-                else:
-
-                    edit_data = str(datetime.datetime.now()) + ' ' + data['sender'] + ' -> You: ' + data['text']
-
-            except:
-
-                edit_data = str(datetime.datetime.now()) + ' Не удалось получить сообщение'
-
-            window_chat(edit_data)
-
 
 
     global status
