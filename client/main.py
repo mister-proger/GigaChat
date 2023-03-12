@@ -55,6 +55,8 @@ def recv_connect():
 
         try:
 
+            print(data)
+
             if data.get('all', False):
 
                 edit_data = str(datetime.datetime.now()) + ' ' + data['sender'] + ': ' + data['text']

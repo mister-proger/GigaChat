@@ -38,6 +38,13 @@ def handle_client(connection, addr):
 
     clients[mask] = connection
 
+    for c in clients.keys():
+        clients[c].send(json.dumps({
+            'sender': 'server',
+            'text': mask + 'подключился',
+            'all': True
+        }).encode())
+
     while True:
 
         try:
@@ -52,7 +59,8 @@ def handle_client(connection, addr):
 
                     clients[c].send(json.dumps({
                         'sender': 'Сервер',
-                        'text': mask + ' отключился'
+                        'text': mask + ' отключился',
+                        'all': True
                     }).encode())
 
                 break
@@ -79,7 +87,8 @@ def handle_client(connection, addr):
 
                 clients[c].send(json.dumps({
                     'sender': 'Сервер',
-                    'text': mask + ' отключился'
+                    'text': mask + ' отключился',
+                    'all': True
                 }).encode())
 
 
