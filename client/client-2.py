@@ -89,10 +89,7 @@ def send_mess(event = None):
 
 def start_connect():
 
-
-
     global status
-
 
     status = False
 
@@ -115,7 +112,6 @@ def start_connect():
     global connection
 
 
-
     connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
     try:
@@ -126,19 +122,18 @@ def start_connect():
 
         window_chat('----- ERROR CONNECT {' + input_str_server_mask.get() + '} | Ошибка данных подключения -----')
 
-    else:
-
-        window_chat('----- CONNECT {' + input_str_server_mask.get() + '} -----')
-
-        connection.send(input_str_mask.get().encode())
-
-        recv_connect = threading.Thread(target = recv_connect)
-
-        recv_connect.start()
-
-        status = True
+        return None
 
 
+    window_chat('----- CONNECT {' + input_str_server_mask.get() + '} -----')
+
+    connection.send(input_str_mask.get().encode())
+
+    recv_connect = threading.Thread(target = recv_connect)
+
+    recv_connect.start()
+
+    status = True
 
 
 
