@@ -1,6 +1,6 @@
 import socket # Сокеты для подключения
 import threading # Многопоток для нескольких клиентов
-from database import main as hs # Запись истории действий и обработка параметров пользователей
+# from database import main as hs # Запись истории действий и обработка параметров пользователей
 import datetime # Для получения текущего времени и даты
 import json # Для пересылки словарей
 
