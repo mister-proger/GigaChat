@@ -125,16 +125,14 @@ def start_connect():
 
         return None
 
-
+    status = True
     window_chat('----- CONNECT {' + input_str_server_mask.get() + '} -----')
 
     connection.send(input_str_mask.get().encode())
-
     recv_connect = threading.Thread(target = recv_connect)
 
     recv_connect.start()
 
-    status = True
 
 
 
