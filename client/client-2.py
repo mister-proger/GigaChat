@@ -1,3 +1,47 @@
+import tkinter as tk
+from tkinter import *
+from tkinter import ttk
+import socket
+import threading
+import datetime
+import json
+# import ctypes
+
+
+
+# ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID('MrCompany.GigaChat')
+
+
+
+# json.loads: str -> dict
+# json.dumps: dict -> str
+
+
+
+window = tk.Tk()
+
+window.title('Добро пожаловать в ГигаЧат!')
+
+# window.iconbitmap('GigaChad.ico')
+
+
+
+connection = ()
+
+status = False
+
+
+def window_chat(string):
+
+    chat.configure(state = tk.NORMAL)
+
+    chat.insert(END, string + '\n')
+
+    chat.configure(state = tk.DISABLED)
+
+    return None
+
+
 
 def recv_connect():
 
