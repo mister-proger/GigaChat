@@ -1,47 +1,3 @@
-import tkinter as tk
-from tkinter import *
-from tkinter import ttk
-import socket
-import threading
-import datetime
-import json
-import ctypes
-
-
-
-ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID('MrCompany.GigaChat')
-
-
-
-# json.loads: str -> dict
-# json.dumps: dict -> str
-
-
-
-window = tk.Tk()
-
-window.title('Добро пожаловать в ГигаЧат!')
-
-window.iconbitmap('GigaChad.ico')
-
-
-
-connection = ()
-
-status = False
-
-
-def window_chat(string):
-
-    chat.configure(state = tk.NORMAL)
-
-    chat.insert(END, string + '\n')
-
-    chat.configure(state = tk.DISABLED)
-
-    return None
-
-
 
 def recv_connect():
 
@@ -57,17 +13,17 @@ def recv_connect():
 
             print(data)
 
-            if data.get('all', False):
+            if data.get('recipient', 'all'):
 
-                edit_data = str(datetime.datetime.now()) + ' ' + data['sender'] + ': ' + data['text']
+                edit_data = '<' + str(datetime.datetime.now()) + '> ' + data['sender'] + ': ' + data['text']
 
             else:
 
-                edit_data = str(datetime.datetime.now()) + ' ' + data['sender'] + ' -> You: ' + data['text']
+                edit_data = '<' + str(datetime.datetime.now()) + '> ' + data['sender'] + ' ' + data['recipient'] + data['text']
 
         except:
 
-            edit_data = str(datetime.datetime.now()) + ' Не удалось получить сообщение'
+            edit_data = '<' + str(datetime.datetime.now()) + '> ' + ' Не удалось получить сообщение'
 
         window_chat(edit_data)
 
@@ -83,9 +39,23 @@ def send_mess(event = None):
 
     else:
 
-        connection.sendall(input_str.get().encode())
+        if not input_recipient_str.get():
 
-        input_str.delete(0, 'end')
+            connection.send(json.dumps({
+                'text': input_str.get(),
+                'sender': input_str_mask.get(),
+                'recipient': 'all'
+            }).encode())
+
+            input_str.delete(0, 'end')
+
+        else:
+
+            connection.send(json.dumps({
+                'text': input_str.get(),
+                'sender': input_str_mask.get(),
+                'recipient': input_recipient_str.get()
+            }).encode())
 
 
 
@@ -155,7 +125,7 @@ if True:   # Создаём виджеты для вкладки 'Чат'
     scrollbar = Scrollbar(chat)
     scrollbar.place(relheight = 1, relx = 0.974)
 
-    chat.grid(column = 0, row = 1, columnspan = 2)
+    chat.grid(column = 0, row = 1, columnspan = 3)
 
 
     input_str = Entry(tab_chat)
@@ -163,11 +133,16 @@ if True:   # Создаём виджеты для вкладки 'Чат'
     input_str.grid(column = 0, row = 2, sticky='nesw')
 
 
-    send_button = Button(tab_chat, text = 'Отправить', command = send_mess, width = 15)
+    send_button = Button(tab_chat, text = 'Отправить', command = send_mess)
 
     window.bind('<Return>', send_mess)
 
     send_button.grid(column = 1, row = 2)
+
+
+    input_recipient_str = Entry(tab_chat)
+
+    input_recipient_str.grid(column = 2, row = 2, sticky='nesw')
 
 
 
