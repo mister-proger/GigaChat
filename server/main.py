@@ -6,7 +6,7 @@ import json # Для пересылки словарей
 
 
 
-HOST = '192.168.0.169'
+HOST = '26.44.12.34'
 
 PORT = 1042
 
@@ -59,7 +59,7 @@ def handle_client(connection, addr):
 
                 if messange.get('recipient', 'all') == 'all':
 
-                    print('<' + str(datetime.datetime.now()) + '>', mask + ':', messange['text'])
+                    print('<' + str(datetime.datetime.now())[10:-10] + '>', mask + ':', messange['text'])
 
                     for c in clients.keys():
 
@@ -71,7 +71,7 @@ def handle_client(connection, addr):
 
                 else:
 
-                    print('<' + str(datetime.datetime.now()) + '>', mask, '->', messange['recipient'] + ':', messange['text'])
+                    print('<' + str(datetime.datetime.now())[10:-10] + '>', mask, '->', messange['recipient'] + ':', messange['text'])
 
                     clients[messange['recipient']].send(json.dumps({
                         'sender': mask,
@@ -87,7 +87,7 @@ def handle_client(connection, addr):
 
         except:
 
-            print('<' + str(datetime.datetime.now()) + '>', mask, 'отключился')
+            print('<' + str(datetime.datetime.now())[10:-10] + '>', mask, 'отключился')
 
             del clients[mask]
 

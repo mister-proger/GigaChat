@@ -5,11 +5,11 @@ import socket
 import threading
 import datetime
 import json
-# import ctypes
+import ctypes
 
 
 
-# ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID('MrCompany.GigaChat')
+ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID('MrCompany.GigaChat')
 
 
 
@@ -22,7 +22,7 @@ window = tk.Tk()
 
 window.title('Добро пожаловать в ГигаЧат!')
 
-# window.iconbitmap('GigaChad.ico')
+window.iconbitmap('GigaChad.ico')
 
 
 
@@ -59,15 +59,15 @@ def recv_connect():
 
             if data.get('recipient', 'all'):
 
-                edit_data = '<' + str(datetime.datetime.now()) + '> ' + data['sender'] + ': ' + data['text']
+                edit_data = '<' + str(datetime.datetime.now())[10:-10] + '> ' + data['sender'] + ': ' + data['text']
 
             else:
 
-                edit_data = '<' + str(datetime.datetime.now()) + '> ' + data['sender'] + ' ' + data['recipient'] + data['text']
+                edit_data = '<' + str(datetime.datetime.now())[10:-10] + '> ' + data['sender'] + ' ' + data['recipient'] + data['text']
 
         except:
 
-            edit_data = '<' + str(datetime.datetime.now()) + '> ' + ' Не удалось получить сообщение'
+            edit_data = '<' + str(datetime.datetime.now())[10:-10] + '> ' + ' Не удалось получить сообщение'
 
         window_chat(edit_data)
 
