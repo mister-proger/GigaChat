@@ -35,7 +35,7 @@ def window_chat(string):
 
     chat.configure(state = tk.NORMAL)
 
-    chat.insert(END, str(string).replace("'", '') + '\n')
+    chat.insert(END, string + '\n')
 
     chat.configure(state = tk.DISABLED)
 
@@ -63,7 +63,7 @@ def recv_connect():
 
             else:
 
-                edit_data = '<' + str(datetime.datetime.now())[11:-10] + '> ' + data['sender'] + ' -> ' + data['recipient'] + ':', data['text']
+                edit_data = str('<' + str(datetime.datetime.now())[11:-10] + '> ' + data['sender'] + ' -> ' + data['recipient'] + ':', data['text'])
 
         except:
 
