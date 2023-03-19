@@ -101,6 +101,8 @@ def send_mess(event = None):
                 'recipient': input_recipient_str.get()
             }).encode())
 
+            input_str.delete(0, 'end')
+
 
 
 def start_connect():
