@@ -45,7 +45,7 @@ def handle_client(connection, addr):
             'all': True
         }).encode())
 
-    while True:
+    while clients.get(mask, False):
 
         try:
 
@@ -53,7 +53,7 @@ def handle_client(connection, addr):
 
             if not messange:
 
-                break
+                OH_NOT_CRINGE = 10 / 0
 
             else:
 
@@ -63,15 +63,23 @@ def handle_client(connection, addr):
 
                     for c in clients.keys():
 
-                        clients[c].send(json.dumps({
-                            'sender': mask,
-                            'text': messange['text'],
-                            'recipient': 'all'
-                        }).encode())
+                        del_c = c
+
+                        try:
+
+                            clients[c].send(json.dumps({
+                                'sender': mask,
+                                'text': messange['text'],
+                                'recipient': 'all'
+                            }).encode())
+
+                        except:
+
+                            del clients[del_c]
 
                 else:
 
-                    print('<' + str(datetime.datetime.now())[10:-10] + '>', mask, '->', messange['recipient'] + ':', messange['text'])
+                    print('<' + str(datetime.datetime.now())[11:-10] + '>', mask, '->', messange['recipient'] + ':', messange['text'])
 
                     clients[messange['recipient']].send(json.dumps({
                         'sender': mask,
@@ -87,7 +95,7 @@ def handle_client(connection, addr):
 
         except:
 
-            print('<' + str(datetime.datetime.now())[10:-10] + '>', mask, 'отключился')
+            print('<' + str(datetime.datetime.now())[11:-10] + '>', mask, 'отключился')
 
             del clients[mask]
 
@@ -98,6 +106,21 @@ def handle_client(connection, addr):
                     'text': mask + ' отключился',
                     'recipient': 'all'
                 }).encode())
+
+            return None
+
+    print('<' + str(datetime.datetime.now())[11:-10] + '>', mask, 'отключился')
+
+    del clients[mask]
+
+    for c in clients.keys():
+        clients[c].send(json.dumps({
+            'sender': 'server',
+            'text': mask + ' отключился',
+            'recipient': 'all'
+        }).encode())
+
+    return None
 
 
 
