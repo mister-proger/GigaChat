@@ -57,17 +57,17 @@ def recv_connect():
 
             print(data)
 
-            if data.get('recipient', 'all'):
+            if data.get('recipient', 'all') == 'all':
 
-                edit_data = '<' + str(datetime.datetime.now())[10:-10] + '> ' + data['sender'] + ': ' + data['text']
+                edit_data = '<' + str(datetime.datetime.now())[11:-10] + '> ' + data['sender'] + ': ' + data['text']
 
             else:
 
-                edit_data = '<' + str(datetime.datetime.now())[10:-10] + '> ' + data['sender'] + ' ' + data['recipient'] + data['text']
+                edit_data = '<' + str(datetime.datetime.now())[11:-10] + '> ' + data['sender'] + ' -> ' + data['recipient'] + data['text']
 
         except:
 
-            edit_data = '<' + str(datetime.datetime.now())[10:-10] + '> ' + ' Не удалось получить сообщение'
+            edit_data = '<' + str(datetime.datetime.now())[11:-10] + '> ' + ' Не удалось получить сообщение'
 
         window_chat(edit_data)
 

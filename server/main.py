@@ -28,7 +28,7 @@ print('Сервер запущен на адресе', HOST + ':' + str(PORT))
 
 # Хандлер клиентов
 
-def handle_client(connection, addr):
+def handle_client(connection):
 
     global clients
 
@@ -59,7 +59,7 @@ def handle_client(connection, addr):
 
                 if messange.get('recipient', 'all') == 'all':
 
-                    print('<' + str(datetime.datetime.now())[10:-10] + '>', mask + ':', messange['text'])
+                    print('<' + str(datetime.datetime.now()) + '>', mask + ':', messange['text'])
 
                     for c in clients.keys():
 
@@ -79,23 +79,33 @@ def handle_client(connection, addr):
 
                 else:
 
-                    print('<' + str(datetime.datetime.now())[11:-10] + '>', mask, '->', messange['recipient'] + ':', messange['text'])
+                    print('<' + str(datetime.datetime.now()) + '>', mask, '->', messange['recipient'] + ':', messange['text'])
 
-                    clients[messange['recipient']].send(json.dumps({
-                        'sender': mask,
-                        'recipient': messange['recipient'],
-                        'text': messange['text']
-                    }))
+                    try:
 
-                    clients[mask].send(json.dumps({
-                        'sender': mask,
-                        'recipient': messange['recipient'],
-                        'text': messange['text']
-                    }))
+                        clients[messange['recipient']].send(json.dumps({
+                            'sender': mask,
+                            'recipient': messange['You'],
+                            'text': messange['text']
+                        }).encode())
+
+                        clients[mask].send(json.dumps({
+                            'sender': 'You',
+                            'recipient': messange['recipient'],
+                            'text': messange['text']
+                        }).encode())
+
+                    except:
+
+                        clients[mask].send(json.dumps({
+                            'sender': 'server',
+                            'recipient': 'You',
+                            'text': 'Не удалось отправить сообщение пользователю'
+                        }).encode())
 
         except:
 
-            print('<' + str(datetime.datetime.now())[11:-10] + '>', mask, 'отключился')
+            print('<' + str(datetime.datetime.now()) + '>', mask, 'отключился')
 
             del clients[mask]
 
@@ -130,5 +140,5 @@ while True:
 
     connection, addr = s.accept()
 
-    client_thread = threading.Thread(target=handle_client, args=(connection, str(addr)))
+    client_thread = threading.Thread(target=handle_client, args=(connection))
     client_thread.start()
