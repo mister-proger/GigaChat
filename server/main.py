@@ -85,7 +85,7 @@ def handle_client(connection):
 
                         clients[messange['recipient']].send(json.dumps({
                             'sender': mask,
-                            'recipient': messange['You'],
+                            'recipient': 'You',
                             'text': messange['text']
                         }).encode())
 
@@ -140,5 +140,5 @@ while True:
 
     connection, addr = s.accept()
 
-    client_thread = threading.Thread(target=handle_client, args=(connection))
+    client_thread = threading.Thread(target=handle_client, args=(connection,))
     client_thread.start()
