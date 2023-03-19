@@ -69,7 +69,7 @@ def recv_connect():
 
             edit_data = '<' + str(datetime.datetime.now())[11:-10] + '> ' + 'Не удалось получить сообщение'
 
-        window_chat(edit_data)
+        window_chat(str(edit_data))
 
 
 
