@@ -243,3 +243,5 @@ if True:   # Создаём виджеты параметров подключе
 tab_control.grid(row = 0, sticky = 'w')
 
 window.mainloop()
+
+status = False
