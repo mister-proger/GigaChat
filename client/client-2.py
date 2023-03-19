@@ -6,13 +6,7 @@ import threading
 import datetime
 import json
 # import ctypes
-
-
-
 # ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID('MrCompany.GigaChat')
-
-
-
 # json.loads: str -> dict
 # json.dumps: dict -> str
 
@@ -29,8 +23,6 @@ window.title('Добро пожаловать в ГигаЧат!')
 connection = ()
 
 status = False
-
-
 def window_chat(string):
 
     chat.configure(state = tk.NORMAL)
@@ -40,9 +32,6 @@ def window_chat(string):
     chat.configure(state = tk.DISABLED)
 
     return None
-
-
-
 def recv_connect():
 
     global connection
@@ -68,7 +57,6 @@ def recv_connect():
         except:
 
             edit_data = '<' + str(datetime.datetime.now()) + '> ' + ' Не удалось получить сообщение'
-
         window_chat(edit_data)
 
 
@@ -80,7 +68,6 @@ def send_mess(event = None):
     if not input_str.get() or not status:
 
         return None
-
     else:
 
         if not input_recipient_str.get():
@@ -110,7 +97,6 @@ def start_connect():
     global status
 
     status = False
-
     HOST = input_str_HOST.get()
 
     try:
@@ -122,8 +108,6 @@ def start_connect():
         window_chat('----- ERROR PORT | ' + input_str_PORT.get() + ' -----')
 
         return None
-
-
     global connection
 
 
@@ -138,7 +122,6 @@ def start_connect():
         window_chat('----- ERROR CONNECT {' + input_str_server_mask.get() + '} | Ошибка данных подключения -----')
 
         return None
-
     status = True
     window_chat('----- CONNECT {' + input_str_server_mask.get() + '} -----')
 
@@ -151,7 +134,6 @@ def start_connect():
 
 
 if True:   # Создаём вкладки
-
     tab_control = ttk.Notebook(window)
 
     tab_chat = ttk.Frame(tab_control)
@@ -163,7 +145,6 @@ if True:   # Создаём вкладки
 
 
 if True:   # Создаём виджеты для вкладки 'Чат'
-
     chat = Text(tab_chat, state = DISABLED, width = 80)
 
     scrollbar = Scrollbar(chat)
@@ -191,7 +172,6 @@ if True:   # Создаём виджеты для вкладки 'Чат'
 
 
 if True:   # Создаём виджеты параметров подключения
-
     str_HOST = Label(tab_setting, text = 'Адрес')
 
     str_HOST.grid(column=0, row=0)
