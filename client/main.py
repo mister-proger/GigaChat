@@ -63,7 +63,7 @@ def recv_connect():
 
             else:
 
-                edit_data = '<' + str(datetime.datetime.now())[11:-10] + '> ' + data['sender'] + ' -> ' + data['recipient'] + ':', data['text']
+                edit_data = '<' + str(datetime.datetime.now())[11:-10] + '> ' + data['sender'] + ' -> ' + data['recipient'] + ': ' + data['text']
 
         except:
 
