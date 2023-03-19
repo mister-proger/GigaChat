@@ -35,7 +35,7 @@ def window_chat(string):
 
     chat.configure(state = tk.NORMAL)
 
-    chat.insert(END, string + '\n')
+    chat.insert(END, str(string).replace("'", '') + '\n')
 
     chat.configure(state = tk.DISABLED)
 
