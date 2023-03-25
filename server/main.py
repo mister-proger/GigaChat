@@ -6,7 +6,7 @@ import json # Для пересылки словарей
 
 
 
-HOST = '26.44.12.34'
+HOST = '127.0.0.1'
 
 PORT = 1042
 
@@ -26,6 +26,7 @@ print('Сервер запущен на адресе', HOST + ':' + str(PORT))
 
 
 
+
 # Хандлер клиентов
 
 def handle_client(connection):
@@ -33,6 +34,16 @@ def handle_client(connection):
     global clients
 
     mask = connection.recv(1024).decode()
+
+    if mask in clients.keys() or mask == 'server':
+
+        connection.send(json.dumps({
+            'sender': 'server',
+            'text': 'Данный никнейм занят или запрещён',
+            'recipient': 'You'
+        }).encode())
+
+        return None
 
     print('<' + str(datetime.datetime.now()) + '>', mask, 'подключился')
 
@@ -140,5 +151,5 @@ while True:
 
     connection, addr = s.accept()
 
-    client_thread = threading.Thread(target=handle_client, args=(connection,))
+    client_thread = threading.Thread(target = handle_client, args = (connection,))
     client_thread.start()

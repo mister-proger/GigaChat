@@ -8,7 +8,6 @@ import json
 import ctypes
 
 
-
 ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID('MrCompany.GigaChat')
 
 
@@ -20,7 +19,7 @@ ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID('MrCompany.GigaCha
 
 window = tk.Tk()
 
-window.title('Добро пожаловать в ГигаЧат!')
+window.title('GigaChat')
 
 window.iconbitmap('GigaChad.ico')
 
@@ -49,27 +48,39 @@ def recv_connect():
 
     global status
 
-    while status:
+    try:
 
-        data = json.loads(connection.recv(1024).decode())
+        while status:
 
-        try:
+            data = json.loads(connection.recv(1024).decode())
 
-            print(data)
+            try:
 
-            if data.get('recipient', 'all') == 'all':
+                print(data)
 
-                edit_data = '<' + str(datetime.datetime.now())[11:-10] + '> ' + data['sender'] + ': ' + data['text']
+                if data.get('recipient', 'all') == 'all':
 
-            else:
+                    edit_data = '<' + str(datetime.datetime.now())[11:-10] + '> ' + data['sender'] + ': ' + data['text']
 
-                edit_data = '<' + str(datetime.datetime.now())[11:-10] + '> ' + data['sender'] + ' -> ' + data['recipient'] + ': ' + data['text']
+                else:
 
-        except:
+                    edit_data = '<' + str(datetime.datetime.now())[11:-10] + '> ' + data['sender'] + ' -> ' + data['recipient'] + ': ' + data['text']
 
-            edit_data = '<' + str(datetime.datetime.now())[11:-10] + '> ' + 'Не удалось получить сообщение'
+            except:
 
-        window_chat(str(edit_data))
+                edit_data = '<' + str(datetime.datetime.now())[11:-10] + '> ' + 'ERROR FOR RECV MESSENGE'
+
+            window_chat(str(edit_data))
+
+        window_chat('----- DISCONNECT {' + input_str_server_mask.get() + '} -----')
+
+        return None
+
+    except:
+
+        window_chat('----- DISCONNECT {' + input_str_server_mask.get() + '} | SERVER KICK -----')
+
+    return None
 
 
 
@@ -137,7 +148,7 @@ def start_connect():
 
     except:
 
-        window_chat('----- ERROR CONNECT {' + input_str_server_mask.get() + '} | Ошибка данных подключения -----')
+        window_chat('----- ERROR CONNECT {' + input_str_server_mask.get() + '} | ERROR-DATA -----')
 
         return None
 
@@ -152,7 +163,7 @@ def start_connect():
 
 
 
-if True:   # Создаём вкладки
+if True:
 
     tab_control = ttk.Notebook(window)
 
@@ -164,7 +175,7 @@ if True:   # Создаём вкладки
 
 
 
-if True:   # Создаём виджеты для вкладки 'Чат'
+if True:
 
     chat = Text(tab_chat, state = DISABLED, width = 80)
 
@@ -179,7 +190,7 @@ if True:   # Создаём виджеты для вкладки 'Чат'
     input_str.grid(column = 0, row = 2, sticky='nesw')
 
 
-    send_button = Button(tab_chat, text = 'Отправить', command = send_mess)
+    send_button = Button(tab_chat, text = 'send', command = send_mess)
 
     window.bind('<Return>', send_mess)
 
@@ -191,25 +202,28 @@ if True:   # Создаём виджеты для вкладки 'Чат'
     input_recipient_str.grid(column = 2, row = 2, sticky='nesw')
 
 
+    audio_on = Button
 
-if True:   # Создаём виджеты параметров подключения
 
-    str_HOST = Label(tab_setting, text = 'Адрес')
+
+if True:
+
+    str_HOST = Label(tab_setting, text = 'IP')
 
     str_HOST.grid(column=0, row=0)
 
 
-    str_PORT = Label(tab_setting, text = 'Порт')
+    str_PORT = Label(tab_setting, text = 'Port')
 
     str_PORT.grid(column=0, row=1)
 
 
-    str_server_mask = Label(tab_setting, text = 'Псевдоним')
+    str_server_mask = Label(tab_setting, text = 'Server mask')
 
     str_server_mask.grid(column=0, row=2)
 
 
-    str_mask = Label(tab_setting, text = 'Логин')
+    str_mask = Label(tab_setting, text = 'Login')
 
     str_mask.grid(column = 0, row = 3)
 
@@ -234,13 +248,16 @@ if True:   # Создаём виджеты параметров подключе
     input_str_mask.grid(column=1, row=3)
 
 
-    button_start_connect = Button(tab_setting, text = 'Подключиться', command = start_connect)
+    button_start_connect = Button(tab_setting, text = 'Try connect', command = start_connect)
 
     button_start_connect.grid(column = 2, row = 0, rowspan = 4, sticky = 'nsew')
 
 
 
 tab_control.grid(row = 0, sticky = 'w')
+
+status = False
+
 
 window.mainloop()
 

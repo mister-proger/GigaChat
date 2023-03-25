@@ -21,6 +21,7 @@ input_stream = audio.open(format=FORMAT, channels=CHANNELS,
     rate=RATE, input=True,
     frames_per_buffer=CHUNK_SIZE)
 
+# открытие вывода аудио
 output_stream = audio.open(format=FORMAT, channels=CHANNELS,
     rate=RATE, output=True,
     frames_per_buffer=CHUNK_SIZE)

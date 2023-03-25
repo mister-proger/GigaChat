@@ -17,6 +17,7 @@ server_socket.listen()
 # список клиентов
 clients = []
 
+
 # отправка данных другим клиентам
 def broadcast_data(client_socket, data):
     for c in clients:
