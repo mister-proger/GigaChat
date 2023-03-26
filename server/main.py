@@ -35,11 +35,11 @@ def handle_client(connection):
 
     mask = connection.recv(1024).decode()
 
-    if mask in clients.keys() or mask == 'server':
+    if mask in clients.keys() or mask == 'server' or ' ' in mask or mask == 'all':
 
         connection.send(json.dumps({
             'sender': 'server',
-            'text': 'Данный никнейм занят или запрещён',
+            'text': 'Данный никнейм занят или содержит запрещённые символы или слова',
             'recipient': 'You'
         }).encode())
 
@@ -53,7 +53,7 @@ def handle_client(connection):
         clients[c].send(json.dumps({
             'sender': 'server',
             'text': mask + ' подключился',
-            'all': True
+            'recipient': 'all'
         }).encode())
 
     while clients.get(mask, False):

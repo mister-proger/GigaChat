@@ -1,31 +1,40 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // создаем WebSocket-соединение
-    const socket = new WebSocket('ws://localhost:8765/');
+    // создаем TCP-соединение
+    const socket = new TcpSocket('127.0.0.1', 1042);
 
     // функция для добавления нового сообщения в чат
     function addMessage(jsonStr, time) {
         const data = JSON.parse(jsonStr);
-        const message = data.message;
+        const sender = data.sender;
+        const recipient = data.recipient;
+        const message = data.text;
 
         const messageEl = document.createElement('div');
         messageEl.classList.add('message');
-        messageEl.innerHTML = `[${new Date(time * 1000).toLocaleTimeString()}] ${message}`;
+        let messageText = `[${new Date(time * 1000).toLocaleTimeString()}] `;
+        if (recipient === 'all') {
+            messageText += `${sender}: `;
+        } else {
+            messageText += `${sender} -> ${recipient}: `;
+        }
+        messageText += message;
+        messageEl.textContent = messageText;
         messagesEl.appendChild(messageEl);
 
         messagesEl.scrollTop = messagesEl.scrollHeight;
-        }
+    }
 
+    // обрабатываем установку соединения
+    socket.onconnect = () => {
+        console.log('TCP connection established.');
+        socket.send('BRW');
+    };
 
-    // обрабатываем открытие соединения
-    socket.addEventListener('open', (event) => {
-        console.log('WebSocket connection established.');
-    });
-
-    // обрабатываем сообщения от сервера
-    socket.addEventListener('message', (event) => {
+    // обрабатываем прием данных от сервера
+    socket.ondata = (event) => {
         const data = JSON.parse(event.data);
         addMessage(data.message, data.time);
-    });
+    };
 
     // обрабатываем отправку сообщения из формы
     const messageForm = document.getElementById('message-form');
@@ -36,7 +45,10 @@ document.addEventListener('DOMContentLoaded', () => {
         // отправляем сообщение, если оно не пустое
         if (message.trim() !== '') {
             const data = {
-                message: message
+                type: 'mess',
+                sender: 'BRW',
+                text: message,
+                recipient: 'all'
             };
             socket.send(JSON.stringify(data));
             messageInput.value = '';

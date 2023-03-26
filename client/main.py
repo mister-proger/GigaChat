@@ -80,6 +80,8 @@ def recv_connect():
 
         window_chat('----- DISCONNECT {' + input_str_server_mask.get() + '} | SERVER KICK -----')
 
+    window_chat('----- DISCONNECT {' + input_str_server_mask.get() + '} -----')
+
     return None
 
 
