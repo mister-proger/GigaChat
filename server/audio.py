@@ -1,8 +1,9 @@
 import socket
 import threading
+import time
 
 # конфигурация сервера
-SERVER_HOST = '127.0.0.1'
+SERVER_HOST = '192.168.0.165'
 SERVER_PORT = 1052
 
 # создание сокета
@@ -17,25 +18,17 @@ server_socket.listen()
 # список клиентов
 clients = []
 
-
-# отправка данных другим клиентам
-def broadcast_data(client_socket, data):
-    for c in clients:
-        if c != client_socket:
-            try:
-                c.sendall(data)  # отправка данных
-            except:
-                clients.remove(c)  # удалить отключенных клиентов
-
 # обработка клиентских соединений
 def handle_client(client_socket):
     while True:
         try:
             # получение данных от клиента
             data = client_socket.recv(2048)
-
-            # отправка данных другим клиентам
-            broadcast_data(client_socket, data)
+            for c in clients:
+                try:
+                    c.sendall(data)  # отправка данных
+                except:
+                    clients.remove(c)  # удалить отключенных клиентов
         except:
             # удаление отключенных клиентов
             clients.remove(client_socket)

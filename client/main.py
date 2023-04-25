@@ -158,6 +158,7 @@ def start_connect():
     window_chat('----- CONNECT {' + input_str_server_mask.get() + '} -----')
 
     connection.send(input_str_mask.get().encode())
+    
     recv_connect = threading.Thread(target = recv_connect)
 
     recv_connect.start()
@@ -174,6 +175,9 @@ if True:
 
     tab_setting = ttk.Frame(tab_control)
     tab_control.add(tab_setting, text = 'Параметры')
+
+    tab_audio = ttk.Frame(tab_control)
+    tab_control.add(tab_audio, text = 'Звонок')
 
 
 
@@ -204,7 +208,7 @@ if True:
     input_recipient_str.grid(column = 2, row = 2, sticky='nesw')
 
 
-    audio_on = Button
+    # audio_on = Button
 
 
 
@@ -262,5 +266,7 @@ status = False
 
 
 window.mainloop()
+
+connection.close()
 
 status = False
