@@ -1,3 +1,4 @@
+import time
 import tkinter as tk
 from tkinter import *
 from tkinter import ttk
@@ -6,6 +7,8 @@ import threading
 import datetime
 import json
 import ctypes
+import pyaudio
+from THAudio import encode_audio, decode_audio
 
 
 ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID('MrCompany.GigaChat')
@@ -44,10 +47,6 @@ def window_chat(string):
 
 def recv_connect():
 
-    global connection
-
-    global status
-
     try:
 
         while status:
@@ -58,13 +57,19 @@ def recv_connect():
 
                 print(data)
 
-                if data.get('recipient', 'all') == 'all':
+                if data.get('type', None) == 'text':
 
-                    edit_data = '<' + str(datetime.datetime.now())[11:-10] + '> ' + data['sender'] + ': ' + data['text']
+                    if data.get('recipient', 'all') == 'all':
 
-                else:
+                        edit_data = '<' + str(datetime.datetime.now())[11:-10] + '> ' + data['sender'] + ': ' + data['text']
 
-                    edit_data = '<' + str(datetime.datetime.now())[11:-10] + '> ' + data['sender'] + ' -> ' + data['recipient'] + ': ' + data['text']
+                    else:
+
+                        edit_data = '<' + str(datetime.datetime.now())[11:-10] + '> ' + data['sender'] + ' -> ' + data['recipient'] + ': ' + data['text']
+
+                elif data.get('type', None) == 'audio':
+
+                    play(decode_audio(data['data']))
 
             except:
 
@@ -88,17 +93,21 @@ def recv_connect():
 
 def send_mess(event = None):
 
-    global connection
+    global status
 
     if not input_str.get() or not status:
 
         return None
 
+        if not status:
+
+            status = False
+
     else:
 
         if not input_recipient_str.get():
 
-            connection.send(json.dumps({
+            connection.sendall(json.dumps({
                 'text': input_str.get(),
                 'sender': input_str_mask.get(),
                 'recipient': 'all'
@@ -108,13 +117,78 @@ def send_mess(event = None):
 
         else:
 
-            connection.send(json.dumps({
+            connection.sendall(json.dumps({
                 'text': input_str.get(),
                 'sender': input_str_mask.get(),
                 'recipient': input_recipient_str.get()
             }).encode())
 
             input_str.delete(0, 'end')
+
+def play(audio_data):
+
+    CHUNK = 1024
+    FORMAT = pyaudio.paInt16
+    CHANNELS = 1
+    RATE = 44100
+
+    p = pyaudio.PyAudio()
+
+    stream = p.open(format=FORMAT,
+                    channels=CHANNELS,
+                    rate=RATE,
+                    input=True,
+                    frames_per_buffer=CHUNK)
+
+    p = pyaudio.PyAudio()
+
+    stream.write(audio_data)
+
+    stream.stop_stream()
+
+    stream.close()
+
+    p.terminate()
+
+def record():
+
+    """Записывает один чанк аудио с микрофона и возвращает его в виде строки"""
+    CHUNK = 1024  # Размер блока записываемых данных
+    FORMAT = pyaudio.paInt16  # Формат записываемых данных (16-битный целочисленный)
+    CHANNELS = 1  # Количество каналов (моно)
+    RATE = 44100  # Частота дискретизации (44100 Гц)
+
+    p = pyaudio.PyAudio()  # Создаем объект PyAudio
+
+    # Открываем поток записи аудио
+    stream = p.open(format=FORMAT,
+                    channels=CHANNELS,
+                    rate=RATE,
+                    input=True,
+                    frames_per_buffer=CHUNK)
+
+    # Записываем один чанк аудио
+    data = stream.read(CHUNK)
+
+    # Останавливаем поток записи аудио и закрываем объект PyAudio
+    stream.stop_stream()
+    stream.close()
+    p.terminate()
+
+    return encode_audio(data)
+
+def send_audio():
+
+    while True:
+
+        while audio_status.get() and status:
+
+            connection.sendall(json.dumps({
+                'type': 'audio',
+                'data': record()
+            }).encode())
+
+        time.sleep(0.2)
 
 
 
@@ -157,11 +231,11 @@ def start_connect():
     status = True
     window_chat('----- CONNECT {' + input_str_server_mask.get() + '} -----')
 
-    connection.send(input_str_mask.get().encode())
+    connection.sendall(input_str_mask.get().encode())
     
-    recv_connect = threading.Thread(target = recv_connect)
+    recv_thread = threading.Thread(target = recv_connect)
 
-    recv_connect.start()
+    recv_thread.start()
 
 
 
@@ -206,9 +280,6 @@ if True:
     input_recipient_str = Entry(tab_chat)
 
     input_recipient_str.grid(column = 2, row = 2, sticky='nesw')
-
-
-    # audio_on = Button
 
 
 
@@ -260,13 +331,22 @@ if True:
 
 
 
+if True:
+
+    audio_status = tk.BooleanVar()
+
+    CB_audio_status = tk.Checkbutton(tab_setting, text = 'Включить аудио', variable = audio_status)
+
+    CB_audio_status.grid(column = 0, row = 4, columnspan = 3, sticky = 'nsew')
+
+threading.Thread(target=send_audio).start()
+
+
 tab_control.grid(row = 0, sticky = 'w')
 
 status = False
 
 
 window.mainloop()
-
-connection.close()
 
 status = False
