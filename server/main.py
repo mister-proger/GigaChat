@@ -1,169 +1,115 @@
-import socket # Сокеты для подключения
-import threading # Многопоток для нескольких клиентов
-# from database import main as hs # Запись истории действий и обработка параметров пользователей
-import datetime # Для получения текущего времени и даты
-import json # Для пересылки словарей
-
+import HPTP
+import threading
+import json
 
 
 HOST = '127.0.0.1'
 
-PORT = 1052
+PORT = 1072
 
 clients = {}
 
+socket = HPTP.Server()
 
+socket.bind((HOST, PORT))
 
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
-s.bind((HOST, PORT))
-
-s.listen()
-
-
+socket.listen()
 
 print('Сервер запущен на адресе', HOST + ':' + str(PORT))
 
 
+def handle_client(conn):
 
+    mask = str(conn)
 
-# Хандлер клиентов
+    clients[mask] = conn
 
-def handle_client(connection):
+    print(f'Клиент {mask} подключён')
 
-    global clients
+    while True:
 
-    mask = connection.recv(1024).decode()
+        packet = conn.recv()
 
-    if mask in clients.keys() or mask == 'server' or ' ' in mask or mask == 'all':
+        head = packet[0].decode()
 
-        connection.sendall(json.dumps({
-            'sender': 'server',
-            'text': 'Данный никнейм занят или содержит запрещённые символы или слова',
-            'recipient': 'You'
-        }).encode())
+        if head == 'audio':
 
-        return None
+            for client in clients.keys():
 
-    print('<' + str(datetime.datetime.now()) + '>', mask, 'подключился')
+                if client != mask:
 
-    clients[mask] = connection
+                    clients[client].send(head.encode(), packet[1])
 
-    for c in clients.keys():
-        clients[c].sendall(json.dumps({
-            'sender': 'server',
-            'text': mask + ' подключился',
-            'recipient': 'all'
-        }).encode())
+        elif head == 'mess':
 
-    while clients.get(mask, False):
+            mess = json.loads(packet[1].decode())
 
-        try:
+            print(mess)
 
-            messange = b''
+            if mess['recipient'] == 'all':
 
-            while True:
+                for client in clients.keys():
 
-                data_chunk = connection.recv(1024)
-
-                if not data_chunk:
-
-                    break
-
-                messange += data_chunk
-
-            messange = json.loads(messange.decode())
-
-            if not messange:
-
-                OH_NO_CRINGE = 10 / 0
+                    clients[client].send('mess'.encode(), json.dumps({
+                        'sender': mask,
+                        'recipient': 'all',
+                        'text': mess['text']
+                    }).encode())
 
             else:
 
-                if messange.get('recipient', 'all') == 'all':
+                try:
 
-                    print('<' + str(datetime.datetime.now()) + '>', mask + ':', messange['text'])
+                    clients[mask].send('mess'.encode(), json.dumps({
+                        'text': mess['text'],
+                        'recipient': mess['recipient'],
+                        'sender': 'You'
+                    }).encode())
 
-                    for c in clients.keys():
+                    clients[mess['recipient']].send('mess'.encode(), json.dumps({
+                        'text': mess['text'],
+                        'recipient': 'You',
+                        'sender': mess['recipient']
+                    }).encode())
 
-                        del_c = c
+                except KeyError:
 
-                        try:
+                    clients[mask].send('mess'.encode(), json.dumps({
+                        'text': 'Ошибка отправки личного сообщения',
+                        'recipient': 'server',
+                        'sender': 'You'
+                    }).encode())
 
-                            clients[c].sendall(json.dumps({
-                                'type': 'text',
-                                'sender': mask,
-                                'text': messange['text'],
-                                'recipient': 'all'
-                            }).encode())
+        elif head == 'MASK':
 
-                        except:
+            if packet[1].decode() in ['server', 'You'] + list(clients.keys()):
 
-                            del clients[del_c]
+                clients[mask].send('mess'.encode(), json.dumps({
+                    'text': 'Данный псевдоним занят или запрещён',
+                    'recipient': 'server',
+                    'sender': 'You'
+                }).encode())
 
-                else:
+                continue
 
-                    print('<' + str(datetime.datetime.now()) + '>', mask, '->', messange['recipient'] + ':', messange['text'])
-
-                    try:
-
-                        clients[messange['recipient']].sendall(json.dumps({
-                            'sender': mask,
-                            'recipient': 'You',
-                            'text': messange['text']
-                        }).encode())
-
-                        clients[mask].sendall(json.dumps({
-                            'sender': 'You',
-                            'recipient': messange['recipient'],
-                            'text': messange['text']
-                        }).encode())
-
-                    except:
-
-                        clients[mask].send(json.dumps({
-                            'sender': 'server',
-                            'recipient': 'You',
-                            'text': 'Не удалось отправить сообщение пользователю'
-                        }).encode())
-
-        except:
-
-            print('<' + str(datetime.datetime.now()) + '>', mask, 'отключился')
+            old_mask = mask
 
             del clients[mask]
 
-            for c in clients.keys():
+            mask = packet[1].decode()
 
-                clients[c].sendall(json.dumps({
-                    'sender': 'server',
-                    'text': mask + ' отключился',
-                    'recipient': 'all'
-                }).encode())
+            clients[mask] = conn
 
-            return None
+            print(f'Смена никнейма: {old_mask} -> {mask}')
 
-    print('<' + str(datetime.datetime.now())[11:-10] + '>', mask, 'отключился')
+            del old_mask
 
-    try:
+        else:
 
-        del clients[mask]
-
-    finally:
-
-        for c in clients.keys():
-            clients[c].sendall(json.dumps({
-                'sender': 'server',
-                'text': mask + ' отключился',
-                'recipient': 'all'
-            }).encode())
-
-    return None
+            print(f'Неизвестный формат сообщения {head}')
 
 
-def command():
-
-    global clients
+def console():
 
     while True:
 
@@ -177,28 +123,27 @@ def command():
 
                     del clients[' '.join(command[1:])]
 
-                except:
+                except KeyError:
 
                     print(f'Клиент {" ".join(command[1:])} не найден')
 
             else:
 
-                assert OSError
+                raise TypeError
 
-        except:
+        except TypeError:
 
             print('Неверная команда')
 
 
-command_thread = threading.Thread(target = command)
+command_thread = threading.Thread(target = console)
 
 command_thread.start()
 
-# Цикл ожидания подключения клиентов
-
 while True:
 
-    connection, addr = s.accept()
+    connection, addr = socket.accept()
 
     client_thread = threading.Thread(target = handle_client, args = (connection,))
+
     client_thread.start()
