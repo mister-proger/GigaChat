@@ -7,6 +7,22 @@ import json
 import ctypes
 import ABOTP
 
+
+class Semaphore:
+
+    def __init__(self, meaning: bool):
+
+        self.semaphore = meaning
+
+    def set(self, meaning: bool) -> None:
+
+        self.semaphore = meaning
+
+    def get(self) -> bool:
+
+        return self.semaphore
+
+
 ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID('MrCompany.GigaChat')
 
 window = tk.Tk()
@@ -17,7 +33,7 @@ window.iconbitmap('GigaChad.ico')
 
 connection = ABOTP.Client()
 
-status = False
+status = Semaphore(meaning = False)
 
 
 def window_chat(string):
@@ -35,7 +51,7 @@ def recv_connect():
 
     try:
 
-        while status:
+        while status.get():
 
             data = None
 
@@ -73,20 +89,22 @@ def recv_connect():
 
                 window_chat(f'Проблема с получанием сообщения: {data}')
 
-    except:
+    except OSError as error:
 
-        pass
+        window_chat(f'----- DISCONNECT {input_str_server_mask.get()} | ERROR {error} -----')
 
-    window_chat(f'----- DISCONNECT {input_str_server_mask.get()} -----')
+        return None
 
-    return None
+    else:
+
+        window_chat(f'----- DISCONNECT {input_str_server_mask.get()} -----')
+
+        return None
 
 
 def send_mess(event = None):
 
-    global status
-
-    if not input_str.get() or not status:
+    if not input_str.get() or not status.get():
 
         return None
 
@@ -113,35 +131,29 @@ def send_mess(event = None):
 
 def start_connect():
 
-    global recv_connect
-
-    global status
-
-    status = False
-
-    HOST = input_str_HOST.get()
+    host = input_str_HOST.get()
 
     try:
 
-        PORT = int(input_str_PORT.get())
+        port = int(input_str_PORT.get())
 
-    except:
+    except ValueError:
 
-        window_chat('----- ERROR PORT | ' + input_str_PORT.get() + ' -----')
+        window_chat(f'----- ERROR PORT | {input_str_PORT.get()} -----')
 
         return None
 
     try:
 
-        connection.connect((HOST, PORT))
+        connection.connect((host, port))
 
-    except:
+    except OSError as error:
 
-        window_chat('----- ERROR CONNECT {' + input_str_server_mask.get() + '} | ERROR-DATA -----')
+        window_chat(f'----- ERROR CONNECT {input_str_server_mask.get()} | ERROR {error} -----')
 
         return None
 
-    status = True
+    status.set(True)
 
     window_chat('----- CONNECT {' + input_str_server_mask.get() + '} -----')
     
@@ -210,8 +222,6 @@ if True:
     button_start_connect = Button(tab_setting, text = 'Try connect', command = start_connect)
     button_start_connect.grid(column = 2, row = 0, rowspan = 4, sticky = 'nsew')
 
-
-
 # if True:
 #
 #     audio_status = tk.BooleanVar()
@@ -223,8 +233,6 @@ if True:
 
 tab_control.grid(row = 0, sticky = 'w')
 
-status = False
-
 window.mainloop()
 
-status = False
+status.set(False)
