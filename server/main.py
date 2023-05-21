@@ -120,7 +120,9 @@ def handle_client(conn):
 
             elif command == 'users':
 
-                clients[mask].send(['COMMAND'.encode(), 'users'.encode(), json.dumps(clients.keys())])
+                print(list(clients.keys()))
+
+                clients[mask].send(['COMMAND'.encode(), 'users'.encode()] + [x.encode() for x in list(clients.keys())])
 
         else:
 

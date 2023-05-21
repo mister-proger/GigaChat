@@ -63,9 +63,11 @@ def recv_connect():
 
                 data = connection.recv()
 
+                print(data)
+
                 head = data[0].decode()
 
-                if head == 'audio':
+                if head == 'AUDIO':
 
                     pass
 
@@ -84,6 +86,14 @@ def recv_connect():
                         opp = f"{mess['sender']} -> {mess['recipient']}"
 
                     window_chat(time + ' ' + opp + ': ' + mess['text'])
+
+                elif head == 'COMMAND':
+
+                    command = data[1].decode()
+
+                    if command == 'users':
+
+                        window_chat(f'<{datetime.datetime.now().strftime("%H:%M")}> Подключённые клиенты: {" | ".join([x.decode() for x in data[2:]])}')
 
                 else:
 
