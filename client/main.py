@@ -22,6 +22,10 @@ class Semaphore:
 
         return self.semaphore
 
+    def __repr__(self):
+
+        return f'Semaphore | Value: {self.semaphore}'
+
 
 ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID('MrCompany.GigaChat')
 
@@ -65,7 +69,7 @@ def recv_connect():
 
                     pass
 
-                elif head == 'mess':
+                elif head == 'MESS':
 
                     mess = json.loads(data[1].decode())
 
@@ -93,40 +97,58 @@ def recv_connect():
 
         window_chat(f'----- DISCONNECT {input_str_server_mask.get()} | ERROR {error} -----')
 
+        status.set(False)
+
         return None
 
     else:
 
         window_chat(f'----- DISCONNECT {input_str_server_mask.get()} -----')
 
+        status.set(False)
+
         return None
 
 
 def send_mess(event = None):
 
-    if not input_str.get() or not status.get():
+    mess = input_str.get()
 
-        return None
+    if mess.startswith('/'):
+
+        connection.send(['COMMAND'.encode()] + [x.encode() for x in mess[1:].split()])
 
     else:
 
-        if not input_recipient_str.get():
+        if not mess or not status.get():
 
-            connection.send(['mess'.encode(), json.dumps({
-                'text': input_str.get(),
-                'sender': input_str_mask.get(),
-                'recipient': 'all'
-            }).encode()])
+            return None
 
         else:
 
-            connection.send(['mess'.encode(), json.dumps({
-                'text': input_str.get(),
-                'sender': input_str_mask.get(),
-                'recipient': input_recipient_str.get()
-            }).encode()])
+            try:
 
-        input_str.delete(0, 'end')
+                if not input_recipient_str.get():
+
+                    connection.send(['MESS'.encode(), json.dumps({
+                        'text': mess,
+                        'sender': input_str_mask.get(),
+                        'recipient': 'all'
+                    }).encode()])
+
+                else:
+
+                    connection.send(['MESS'.encode(), json.dumps({
+                        'text': mess,
+                        'sender': input_str_mask.get(),
+                        'recipient': input_recipient_str.get()
+                    }).encode()])
+
+                input_str.delete(0, 'end')
+
+            except OSError as error:
+
+                window_chat(f'----- SENDING ERROR {error} -----')
 
 
 def start_connect():
@@ -155,7 +177,7 @@ def start_connect():
 
     status.set(True)
 
-    window_chat('----- CONNECT {' + input_str_server_mask.get() + '} -----')
+    window_chat(f'----- CONNECT {input_str_server_mask.get()} -----')
     
     recv_thread = threading.Thread(target = recv_connect)
 

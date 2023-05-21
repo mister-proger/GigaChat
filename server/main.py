@@ -5,7 +5,7 @@ import json
 
 HOST = '127.0.0.1'
 
-PORT = 1072
+PORT = 1042
 
 clients = {}
 
@@ -32,7 +32,7 @@ def handle_client(conn):
 
         head = packet[0].decode()
 
-        if head == 'audio':
+        if head == 'AUDIO':
 
             for client in clients.keys():
 
@@ -40,7 +40,7 @@ def handle_client(conn):
 
                     clients[client].send([head.encode(), packet[1]])
 
-        elif head == 'mess':
+        elif head == 'MESS':
 
             mess = json.loads(packet[1].decode())
 
@@ -50,7 +50,7 @@ def handle_client(conn):
 
                 for client in clients.keys():
 
-                    clients[client].send(['mess'.encode(), json.dumps({
+                    clients[client].send(['MESS'.encode(), json.dumps({
                         'sender': mask,
                         'recipient': 'all',
                         'text': mess['text']
@@ -60,13 +60,13 @@ def handle_client(conn):
 
                 try:
 
-                    clients[mask].send(['mess'.encode(), json.dumps({
+                    clients[mask].send(['MESS'.encode(), json.dumps({
                         'text': mess['text'],
                         'recipient': mess['recipient'],
                         'sender': 'You'
                     }).encode()])
 
-                    clients[mess['recipient']].send(['mess'.encode(), json.dumps({
+                    clients[mess['recipient']].send(['MESS'.encode(), json.dumps({
                         'text': mess['text'],
                         'recipient': 'You',
                         'sender': mess['recipient']
@@ -74,35 +74,53 @@ def handle_client(conn):
 
                 except KeyError:
 
-                    clients[mask].send(['mess'.encode(), json.dumps({
+                    clients[mask].send(['MESS'.encode(), json.dumps({
                         'text': 'Ошибка отправки личного сообщения',
                         'recipient': 'server',
                         'sender': 'You'
                     }).encode()])
 
-        elif head == 'MASK':
+        elif head == 'COMMAND':
 
-            if packet[1].decode() in ['server', 'You'] + list(clients.keys()):
+            command = packet[1].decode()
 
-                clients[mask].send(['mess'.encode(), json.dumps({
-                    'text': 'Данный псевдоним занят или запрещён',
-                    'recipient': 'server',
-                    'sender': 'You'
-                }).encode()])
+            if command == 'mask':
 
-                continue
+                exm_mask = ' '.join([x.decode() for x in packet[2:]])
 
-            old_mask = mask
+                if exm_mask in ['server', 'You'] + list(clients.keys()):
 
-            del clients[mask]
+                    clients[mask].send(['MESS'.encode(), json.dumps({
+                        'text': 'Данный псевдоним занят или запрещён',
+                        'recipient': 'server',
+                        'sender': 'You'
+                    }).encode()])
 
-            mask = packet[1].decode()
+                    continue
 
-            clients[mask] = conn
+                old_mask = mask
 
-            print(f'Смена никнейма: {old_mask} -> {mask}')
+                del clients[mask]
 
-            del old_mask
+                mask = exm_mask
+
+                clients[mask] = conn
+
+                print(f'Смена никнейма: {old_mask} -> {mask}')
+
+                for client in clients.keys():
+
+                    clients[client].send(['MESS'.encode(), json.dumps({
+                        'sender': 'server',
+                        'recipient': 'all',
+                        'text': f'Смена никнейма: {old_mask} -> {mask}'
+                    }).encode()])
+
+                del old_mask
+
+            elif command == 'users':
+
+                clients[mask].send(['COMMAND'.encode(), 'users'.encode(), json.dumps(clients.keys())])
 
         else:
 

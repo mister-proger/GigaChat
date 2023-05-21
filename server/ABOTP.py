@@ -85,6 +85,7 @@ class Server:
                     packet = self.conn.recv(n - len(data))
 
                     if not packet:
+
                         return None
 
                     data += packet
@@ -96,6 +97,7 @@ class Server:
             objects = []
 
             for _ in range(num_objects):
+
                 len_data = struct.unpack('>I', picking(4))[0]
 
                 obj_data = picking(len_data)
@@ -111,6 +113,7 @@ class Server:
             packet = struct.pack('>I', num_objects)
 
             for obj in objects:
+
                 packet += struct.pack('>I', len(obj)) + obj
 
             self.conn.sendall(packet)
