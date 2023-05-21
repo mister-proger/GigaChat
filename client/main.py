@@ -118,6 +118,8 @@ def send_mess(event = None):
 
         connection.send(['COMMAND'.encode()] + [x.encode() for x in mess[1:].split()])
 
+        input_str.delete(0, 'end')
+
     else:
 
         if not mess or not status.get():
