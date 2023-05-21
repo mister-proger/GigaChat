@@ -1,4 +1,4 @@
-import HPTP
+import ABOTP
 import threading
 import json
 
@@ -9,7 +9,7 @@ PORT = 1072
 
 clients = {}
 
-socket = HPTP.Server()
+socket = ABOTP.Server()
 
 socket.bind((HOST, PORT))
 
@@ -38,7 +38,7 @@ def handle_client(conn):
 
                 if client != mask:
 
-                    clients[client].send(head.encode(), packet[1])
+                    clients[client].send([head.encode(), packet[1]])
 
         elif head == 'mess':
 
@@ -50,45 +50,45 @@ def handle_client(conn):
 
                 for client in clients.keys():
 
-                    clients[client].send('mess'.encode(), json.dumps({
+                    clients[client].send(['mess'.encode(), json.dumps({
                         'sender': mask,
                         'recipient': 'all',
                         'text': mess['text']
-                    }).encode())
+                    }).encode()])
 
             else:
 
                 try:
 
-                    clients[mask].send('mess'.encode(), json.dumps({
+                    clients[mask].send(['mess'.encode(), json.dumps({
                         'text': mess['text'],
                         'recipient': mess['recipient'],
                         'sender': 'You'
-                    }).encode())
+                    }).encode()])
 
-                    clients[mess['recipient']].send('mess'.encode(), json.dumps({
+                    clients[mess['recipient']].send(['mess'.encode(), json.dumps({
                         'text': mess['text'],
                         'recipient': 'You',
                         'sender': mess['recipient']
-                    }).encode())
+                    }).encode()])
 
                 except KeyError:
 
-                    clients[mask].send('mess'.encode(), json.dumps({
+                    clients[mask].send(['mess'.encode(), json.dumps({
                         'text': 'Ошибка отправки личного сообщения',
                         'recipient': 'server',
                         'sender': 'You'
-                    }).encode())
+                    }).encode()])
 
         elif head == 'MASK':
 
             if packet[1].decode() in ['server', 'You'] + list(clients.keys()):
 
-                clients[mask].send('mess'.encode(), json.dumps({
+                clients[mask].send(['mess'.encode(), json.dumps({
                     'text': 'Данный псевдоним занят или запрещён',
                     'recipient': 'server',
                     'sender': 'You'
-                }).encode())
+                }).encode()])
 
                 continue
 

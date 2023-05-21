@@ -1,6 +1,6 @@
 import socket
 import struct
-from typing import Optional
+from typing import Optional, List
 
 
 class Client:
@@ -15,13 +15,11 @@ class Client:
 
         self.sock.connect(address)
 
-    def recv(self) -> list[Optional[bytes]]:
+    def recv(self) -> List[Optional[bytes]]:
 
         def picking(n):
 
             data = b''
-
-            packet = b''
 
             while len(data) < n:
 
@@ -35,17 +33,29 @@ class Client:
 
             return data
 
-        len_data = struct.unpack('>I', picking(4))[0]
+        num_objects = struct.unpack('>I', picking(4))[0]
 
-        head = picking(struct.unpack('>I', picking(4))[0])
+        objects = []
 
-        data = picking(len_data)
+        for _ in range(num_objects):
 
-        return [head, data]
+            len_data = struct.unpack('>I', picking(4))[0]
 
-    def send(self, head: bytes, data: bytes) -> None:
+            obj_data = picking(len_data)
 
-        packet = struct.pack('>I', len(data)) + struct.pack('>I', len(head)) + head + data
+            objects.append(obj_data)
+
+        return objects
+
+    def send(self, objects: List[bytes]) -> None:
+
+        num_objects = len(objects)
+
+        packet = struct.pack('>I', num_objects)
+
+        for obj in objects:
+
+            packet += struct.pack('>I', len(obj)) + obj
 
         self.sock.sendall(packet)
 
@@ -66,7 +76,7 @@ class Server:
 
             self.conn = conn
 
-        def recv(self) -> tuple[bytes]:
+        def recv(self) -> List[Optional[bytes]]:
 
             def picking(n):
 
@@ -77,26 +87,45 @@ class Server:
                     packet = self.conn.recv(n - len(data))
 
                     if not packet:
-
                         return None
 
                     data += packet
 
                 return data
 
-            len_data = struct.unpack('>I', picking(4))[0]
+            num_objects = struct.unpack('>I', picking(4))[0]
 
-            head = picking(struct.unpack('>I', picking(4))[0])
+            objects = []
 
-            data = picking(len_data)
+            for _ in range(num_objects):
 
-            return (head, data)
+                len_data = struct.unpack('>I', picking(4))[0]
 
-        def send(self, head: bytes, data: bytes):
+                obj_data = picking(len_data)
 
-            packet = struct.pack('>I', len(data)) + struct.pack('>I', len(head)) + head + data
+                objects.append(obj_data)
+
+            return objects
+
+        def send(self, objects: List[bytes]) -> None:
+
+            num_objects = len(objects)
+
+            packet = struct.pack('>I', num_objects)
+
+            for obj in objects:
+                
+                packet += struct.pack('>I', len(obj)) + obj
 
             self.conn.sendall(packet)
+
+        def close(self):
+
+            self.conn.close()
+
+        def __del__(self):
+
+            self.close()
 
     def __init__(self, family: Optional[int] = socket.AF_INET):
 
@@ -144,3 +173,6 @@ class Server:
 
         self.sock.close()
 
+    def __del__(self):
+
+        self.close()

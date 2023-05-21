@@ -5,7 +5,7 @@ import threading
 import datetime
 import json
 import ctypes
-import HPTP
+import ABOTP
 
 ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID('MrCompany.GigaChat')
 
@@ -15,7 +15,7 @@ window.title('GigaChat')
 
 window.iconbitmap('GigaChad.ico')
 
-connection = HPTP.Client()
+connection = ABOTP.Client()
 
 status = False
 
@@ -94,19 +94,19 @@ def send_mess(event = None):
 
         if not input_recipient_str.get():
 
-            connection.send('mess'.encode(), json.dumps({
+            connection.send(['mess'.encode(), json.dumps({
                 'text': input_str.get(),
                 'sender': input_str_mask.get(),
                 'recipient': 'all'
-            }).encode())
+            }).encode()])
 
         else:
 
-            connection.send('mess'.encode(), json.dumps({
+            connection.send(['mess'.encode(), json.dumps({
                 'text': input_str.get(),
                 'sender': input_str_mask.get(),
                 'recipient': input_recipient_str.get()
-            }).encode())
+            }).encode()])
 
         input_str.delete(0, 'end')
 
@@ -131,8 +131,6 @@ def start_connect():
 
         return None
 
-    global connection
-
     try:
 
         connection.connect((HOST, PORT))
@@ -146,8 +144,6 @@ def start_connect():
     status = True
 
     window_chat('----- CONNECT {' + input_str_server_mask.get() + '} -----')
-
-    connection.send('MASK'.encode(), input_str_mask.get().encode())
     
     recv_thread = threading.Thread(target = recv_connect)
 
