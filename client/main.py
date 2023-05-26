@@ -6,6 +6,7 @@ import datetime
 import json
 import ctypes
 import ABOTP
+from handler import *
 
 
 class Semaphore:
@@ -39,6 +40,8 @@ connection = ABOTP.Client()
 
 status = Semaphore(meaning = False)
 
+func = ['comm', 'mess']
+
 
 def window_chat(string):
 
@@ -67,37 +70,13 @@ def recv_connect():
 
                 head = data[0].decode()
 
-                if head == 'AUDIO':
+                if head in func:
 
-                    pass
-
-                elif head == 'MESS':
-
-                    mess = json.loads(data[1].decode())
-
-                    time = f'<{datetime.datetime.now().strftime("%H:%M")}>'
-
-                    if mess['recipient'] == 'all':
-
-                        opp = mess['sender']
-
-                    else:
-
-                        opp = f"{mess['sender']} -> {mess['recipient']}"
-
-                    window_chat(time + ' ' + opp + ': ' + mess['text'])
-
-                elif head == 'COMMAND':
-
-                    command = data[1].decode()
-
-                    if command == 'users':
-
-                        window_chat(f'<{datetime.datetime.now().strftime("%H:%M")}> Подключённые клиенты: {" | ".join([x.decode() for x in data[2:]])}')
+                    exec(eval(f'{head}({data})'))
 
                 else:
 
-                    window_chat(f"Неизвестный тип пакета: {head}")
+                    print(f'Отсутствует метод обработки сообщений - {head}')
 
             except KeyError:
 
@@ -126,7 +105,7 @@ def send_mess(event = None):
 
     if mess.startswith('/'):
 
-        connection.send(['COMMAND'.encode()] + [x.encode() for x in mess[1:].split()])
+        connection.send(['command'.encode()] + [x.encode() for x in mess[1:].split()])
 
         input_str.delete(0, 'end')
 
@@ -142,7 +121,7 @@ def send_mess(event = None):
 
                 if not input_recipient_str.get():
 
-                    connection.send(['MESS'.encode(), json.dumps({
+                    connection.send(['mess'.encode(), json.dumps({
                         'text': mess,
                         'sender': input_str_mask.get(),
                         'recipient': 'all'
@@ -150,7 +129,7 @@ def send_mess(event = None):
 
                 else:
 
-                    connection.send(['MESS'.encode(), json.dumps({
+                    connection.send(['mess'.encode(), json.dumps({
                         'text': mess,
                         'sender': input_str_mask.get(),
                         'recipient': input_recipient_str.get()
