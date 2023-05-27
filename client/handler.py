@@ -1,37 +1,43 @@
 import json
-import datetime
+import zipfile
+import zipimport
+import os
 
 
-def audio(data):
-
-    pass
+modules = {}
 
 
-def mess(data):
+def get_mods():
 
-    message = json.loads(data[1].decode())
+    directory = "./mods/"
 
-    time = f'<{datetime.datetime.now().strftime("%H:%M")}>'
+    files = []
 
-    if message['recipient'] == 'all':
+    for file in os.listdir(directory):
 
-        opp = message['sender']
+        if file.endswith(".h4gc"):
 
-    else:
+            files.append(file)
 
-        opp = f"{message['sender']} -> {message['recipient']}"
-
-    return f'window_chat("{time} {opp}: {message["text"]}")'
+    return files
 
 
-def command(data):
+for file in get_mods():
 
-    comm = data[1].decode()
+    modules[file[:-5]] = {'file': zipimport.zipimporter(f'./mods/{file}')}
 
-    if comm == 'users':
+    modules[file[:-5]]['module'] = modules[file[:-5]]['file'].load_module('main')
 
-        return f"window_chat(f'<{datetime.datetime.now().strftime('%H:%M')}> Подключённые клиенты: {' | '.join([x.decode() for x in data[2:]])}')"
+    with zipfile.ZipFile(f'./mods/{file}', 'r') as arch:
 
-    else:
+        with arch.open('info.json') as info:
 
-        return f'window_chat(f"Неизвестный тип пакета: {data[1].decode()}")'
+            modules[file[:-5]]['info'] = json.load(info)
+
+
+# print(modules)
+
+
+def call(module, packet):
+
+    return eval(f"modules['{module}']['module'].main({packet})")

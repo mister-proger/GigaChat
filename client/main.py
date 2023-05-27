@@ -2,11 +2,10 @@ import tkinter as tk
 from tkinter import *
 from tkinter import ttk
 import threading
-import datetime
 import json
 import ctypes
 import ABOTP
-from handler import *
+import handler
 
 
 class Semaphore:
@@ -40,7 +39,9 @@ connection = ABOTP.Client()
 
 status = Semaphore(meaning = False)
 
-func = ['comm', 'mess']
+func = [x[:-5] for x in handler.get_mods()]
+
+# print(func)
 
 
 def window_chat(string):
@@ -72,7 +73,11 @@ def recv_connect():
 
                 if head in func:
 
-                    exec(eval(f'{head}({data})'))
+                    # print(head, data, sep = ' | ')
+
+                    # print(f'handler.call({head}, {data})')
+
+                    exec(eval(f'handler.call("{head}", {data})'))
 
                 else:
 
