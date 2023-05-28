@@ -56,8 +56,6 @@ def s_loader():
 
     _setting['lang'] = load_lang(_setting['setting']['lang'])
 
-    # print(_setting)
-
     return _setting
 
 
@@ -76,8 +74,6 @@ connection = ABOTP.Client()
 status = Semaphore(meaning = False)
 
 func = [x[:-5] for x in handler.get_mods()]
-
-# print(func)
 
 
 def window_chat(string):
@@ -103,17 +99,11 @@ def recv_connect():
 
                 data = connection.recv()
 
-                # print(data)
-
                 head = data[0].decode()
 
                 if head in func:
 
-                    # print('Вызов идёт:', f'eval(f"handler.call("{head}", {data})")', sep = ' | ')
-
                     req = eval(f'handler.call("{head}", {data})')
-
-                    # print(req)
 
                     if type(req) is str:
 

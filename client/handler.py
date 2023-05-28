@@ -4,6 +4,8 @@ import zipimport
 import os
 
 
+print('Загрузка хандлера')
+
 modules = {}
 
 
@@ -24,20 +26,25 @@ def get_mods():
 
 for file in get_mods():
 
-    modules[file[:-5]] = {'file': zipimport.zipimporter(f'./mods/{file}')}
+    name = file[:-5]
 
-    modules[file[:-5]]['module'] = modules[file[:-5]]['file'].load_module('main')
+    modules[name] = {'file': zipimport.zipimporter(f'./mods/{file}')}
+
+    modules[name]['module'] = modules[name]['file'].load_module('main')
 
     with zipfile.ZipFile(f'./mods/{file}', 'r') as arch:
 
         with arch.open('info.json') as info:
 
-            modules[file[:-5]]['info'] = json.load(info)
+            modules[name]['info'] = json.load(info)
 
 
-# print(modules)
+del name
 
 
 def call(module, packet):
 
     return eval(f"modules['{module}']['module'].main({packet})")
+
+
+print('Загрузка хандлера завершена')

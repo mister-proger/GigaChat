@@ -2,9 +2,10 @@ import json
 import datetime
 
 
-def main(data):
+print('Загрузка модуля "mess"')
 
-    print(data)
+
+def main(data):
 
     message = json.loads(data[1].decode())
 
@@ -19,3 +20,6 @@ def main(data):
         opp = f"{message['sender']} -> {message['recipient']}"
 
     return f"{time} {opp}: {message['text']}"
+
+
+print('Загрузка модуля "mess" завершена')

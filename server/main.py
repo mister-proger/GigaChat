@@ -6,7 +6,7 @@ import json
 
 HOST = '127.0.0.1'
 
-PORT = 1052
+PORT = 1042
 
 socket = ABOTP.Server()
 
@@ -53,8 +53,6 @@ class Clients:
 
     def __getitem__(self, item):
 
-        # print(type(item), item, self.masks, self.sockets, sep = ' || ')
-
         if type(item) is str and item in self.masks:
 
             return self.sockets[self.masks.index(item)]
@@ -99,8 +97,6 @@ def handle_client(conn):
 
             mess = json.loads(packet[1].decode())
 
-            # print(mess)
-
             if mess['recipient'] == 'all':
 
                 for client in clients:
@@ -143,7 +139,7 @@ def handle_client(conn):
 
                 exm_mask = ' '.join([x.decode() for x in packet[2:]])
 
-                if exm_mask in ['server', 'You'] + list(clients.masks):
+                if exm_mask in ['server', 'You'] + list(clients.masks) or '|' in exm_mask:
 
                     clients[mask].send(['mess'.encode(), json.dumps({
                         'text': 'Данный псевдоним занят или запрещён',
@@ -171,7 +167,11 @@ def handle_client(conn):
 
                 print('Подключённые клиенты:', list(clients))
 
-                clients[mask].send(['command'.encode(), 'users'.encode()] + [x.encode() for x in clients])
+                clients[mask].send(['mess'.encode(), json.dumps({
+                    'sender': 'server',
+                    'recipient': 'You',
+                    'text': f'подключённые клиенты | {" | ".join(clients.masks)}'
+                }).encode()])
 
         else:
 
@@ -198,8 +198,6 @@ def console():
 
             command = input().split(' ')
 
-            # print(command, clients, clients.masks, clients.sockets, sep = ' || ')
-
             if command[0] == 'kick':
 
                 try:
@@ -217,8 +215,6 @@ def console():
         except TypeError:
 
             print('Неверная команда')
-
-        # print(command, clients, clients.masks, clients.sockets, sep = ' || ')
 
 
 command_thread = threading.Thread(target = console)
