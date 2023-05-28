@@ -5,6 +5,7 @@ import websockets
 # список соединений клиентов
 connections = set()
 
+
 # функция обработки нового клиентского соединения
 async def handler(websocket, path):
     # добавляем новое соединение в список
@@ -19,9 +20,11 @@ async def handler(websocket, path):
         # удаляем соединение из списка при отключении клиента
         connections.remove(websocket)
 
+
 # запускаем сервер
 async def main():
     async with websockets.serve(handler, "localhost", 8080):
         await asyncio.Future()  # бесконечный цикл
+
 
 asyncio.run(main())

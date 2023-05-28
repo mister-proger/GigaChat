@@ -5,14 +5,19 @@ import threading
 import json
 import ctypes
 import ABOTP
+from typing import Optional
 import handler
 
 
 class Semaphore:
 
-    def __init__(self, meaning: bool):
+    def __init__(self, meaning: Optional[bool] = False):
 
         self.semaphore = meaning
+
+    def __repr__(self):
+
+        return f'Semaphore | Value: {self.semaphore}'
 
     def set(self, meaning: bool) -> None:
 
@@ -21,10 +26,6 @@ class Semaphore:
     def get(self) -> bool:
 
         return self.semaphore
-
-    def __repr__(self):
-
-        return f'Semaphore | Value: {self.semaphore}'
 
 
 def s_loader():
@@ -55,7 +56,7 @@ def s_loader():
 
     _setting['lang'] = load_lang(_setting['setting']['lang'])
 
-    print(_setting)
+    # print(_setting)
 
     return _setting
 
@@ -102,17 +103,21 @@ def recv_connect():
 
                 data = connection.recv()
 
-                print(data)
+                # print(data)
 
                 head = data[0].decode()
 
                 if head in func:
 
+                    # print('Вызов идёт:', f'eval(f"handler.call("{head}", {data})")', sep = ' | ')
+
                     req = eval(f'handler.call("{head}", {data})')
+
+                    # print(req)
 
                     if type(req) is str:
 
-                        exec(f'window_chat("{req}")')
+                        window_chat(req)
 
                 else:
 
@@ -126,6 +131,8 @@ def recv_connect():
 
         window_chat(f'----- DISCONNECT | ERROR {error} -----')
 
+        connection.close()
+
         status.set(False)
 
         return None
@@ -133,6 +140,8 @@ def recv_connect():
     else:
 
         window_chat(f'----- DISCONNECT -----')
+
+        connection.close()
 
         status.set(False)
 
@@ -183,6 +192,8 @@ def send_mess(event = None):
 
 
 def start_connect():
+
+    connection.__init__()
 
     host = input_str_HOST.get()
 

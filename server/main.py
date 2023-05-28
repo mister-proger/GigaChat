@@ -1,4 +1,5 @@
 import ABOTP
+import struct
 import threading
 import json
 
@@ -6,8 +7,6 @@ import json
 HOST = '127.0.0.1'
 
 PORT = 1052
-
-clients = {}
 
 socket = ABOTP.Server()
 
@@ -18,39 +17,95 @@ socket.listen()
 print('Сервер запущен на адресе', HOST + ':' + str(PORT))
 
 
+class Clients:
+
+    def __init__(self):
+
+        self.masks = []
+
+        self.sockets = []
+
+    def append(self, mask, _socket):
+
+        self.masks.append(mask)
+
+        self.sockets.append(_socket)
+
+    def close(self, mask):
+
+        index = self.masks.index(mask)
+
+        self.sockets[index].close()
+
+        self.masks.pop(index)
+
+        self.sockets.pop(index)
+
+    def set_mask(self, old, new):
+
+        self.masks[self.masks.index(old)] = new
+
+    def __iter__(self):
+
+        for _socket in self.sockets:
+
+            yield _socket
+
+    def __getitem__(self, item):
+
+        # print(type(item), item, self.masks, self.sockets, sep = ' || ')
+
+        if type(item) is str and item in self.masks:
+
+            return self.sockets[self.masks.index(item)]
+
+        else:
+
+            raise KeyError(f'Неверная маска клиента: {item}')
+
+
+clients = Clients()
+
+
 def handle_client(conn):
 
     mask = str(conn)
 
-    clients[mask] = conn
+    clients.append(mask, conn)
 
     print(f'Клиент {mask} подключён')
 
     while True:
 
-        packet = conn.recv()
+        try:
+
+            packet = conn.recv()
+
+        except (ConnectionResetError, ConnectionAbortedError, ConnectionError, ConnectionRefusedError):
+
+            break
 
         head = packet[0].decode()
 
         if head == 'AUDIO':
 
-            for client in clients.keys():
+            for client in clients:
 
-                if client != mask:
+                if client != conn:
 
-                    clients[client].send([head.encode(), packet[1]])
+                    client.send([head.encode(), packet[1]])
 
         elif head == 'mess':
 
             mess = json.loads(packet[1].decode())
 
-            print(mess)
+            # print(mess)
 
             if mess['recipient'] == 'all':
 
-                for client in clients.keys():
+                for client in clients:
 
-                    clients[client].send(['mess'.encode(), json.dumps({
+                    client.send(['mess'.encode(), json.dumps({
                         'sender': mask,
                         'recipient': 'all',
                         'text': mess['text']
@@ -88,7 +143,7 @@ def handle_client(conn):
 
                 exm_mask = ' '.join([x.decode() for x in packet[2:]])
 
-                if exm_mask in ['server', 'You'] + list(clients.keys()):
+                if exm_mask in ['server', 'You'] + list(clients.masks):
 
                     clients[mask].send(['mess'.encode(), json.dumps({
                         'text': 'Данный псевдоним занят или запрещён',
@@ -98,35 +153,41 @@ def handle_client(conn):
 
                     continue
 
-                old_mask = mask
+                clients.set_mask(mask, exm_mask)
 
-                del clients[mask]
+                print(f'Смена никнейма: {mask} -> {exm_mask}')
+
+                for client in clients:
+
+                    client.send(['mess'.encode(), json.dumps({
+                        'sender': 'server',
+                        'recipient': 'all',
+                        'text': f'смена никнейма | {mask} -> {exm_mask}'
+                    }).encode()])
 
                 mask = exm_mask
 
-                clients[mask] = conn
-
-                print(f'Смена никнейма: {old_mask} -> {mask}')
-
-                for client in clients.keys():
-
-                    clients[client].send(['mess'.encode(), json.dumps({
-                        'sender': 'server',
-                        'recipient': 'all',
-                        'text': f'Смена никнейма: {old_mask} -> {mask}'
-                    }).encode()])
-
-                del old_mask
-
             elif command == 'users':
 
-                print(list(clients.keys()))
+                print('Подключённые клиенты:', list(clients))
 
-                clients[mask].send(['command'.encode(), 'users'.encode()] + [x.encode() for x in list(clients.keys())])
+                clients[mask].send(['command'.encode(), 'users'.encode()] + [x.encode() for x in clients])
 
         else:
 
             print(f'Неизвестный формат сообщения {head}')
+
+    try:
+
+        clients.close(mask)
+
+    except ValueError:
+
+        pass
+
+    print(f'Клиент {mask} отключился')
+
+    return None
 
 
 def console():
@@ -137,11 +198,13 @@ def console():
 
             command = input().split(' ')
 
+            # print(command, clients, clients.masks, clients.sockets, sep = ' || ')
+
             if command[0] == 'kick':
 
                 try:
 
-                    del clients[' '.join(command[1:])]
+                    clients.close(' '.join(command[1:]))
 
                 except KeyError:
 
@@ -154,6 +217,8 @@ def console():
         except TypeError:
 
             print('Неверная команда')
+
+        # print(command, clients, clients.masks, clients.sockets, sep = ' || ')
 
 
 command_thread = threading.Thread(target = console)

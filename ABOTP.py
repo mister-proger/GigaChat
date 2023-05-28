@@ -68,6 +68,7 @@ class Client:
 
 
 class Server:
+
     class Client:
 
         def __init__(self, conn):
