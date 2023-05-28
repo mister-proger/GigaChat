@@ -108,7 +108,11 @@ def recv_connect():
 
                 if head in func:
 
-                    exec(eval(f'handler.call("{head}", {data})'))
+                    req = eval(f'handler.call("{head}", {data})')
+
+                    if type(req) is str:
+
+                        exec(f'window_chat("{req}")')
 
                 else:
 
