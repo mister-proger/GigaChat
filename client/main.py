@@ -11,6 +11,7 @@ del handler
 
 sock = ABOTP.Client()
 
+
 class EventFilter(QObject):
     def __init__(self, tabs):
         super().__init__()
