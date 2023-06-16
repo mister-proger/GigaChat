@@ -1,15 +1,15 @@
-import socket
 import sys
+import threading
 from PyQt5.QtCore import QEvent, QObject
 from PyQt5.QtWidgets import QMainWindow, QTabWidget, QApplication
+import ABOTP
 import handler
 
 
 mods = handler.mods
 del handler
 
-sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-
+sock = ABOTP.Client()
 
 class EventFilter(QObject):
     def __init__(self, tabs):
@@ -37,6 +37,21 @@ class App(QMainWindow):
             print(key, value['code'], mods, sep = ' | ')
             self.mods[key]['widget'] = value['code'](sock)
             self.tab.addTab(self.mods[key]['widget'].layout(), key)
+        print('О да', mods)
+
+    def handler(self, data):
+        if data[0].decode() in self.mods.keys():
+            self.mods[data[0].decode()]['widget'].handler(data)
+        else:
+            print(f'Странный и непонятный пакет: {data}')
+
+
+def handler():
+    while threading.main_thread().is_alive():
+        if not sock.status:
+            continue
+        data = sock.recv()
+        window.handler(data)
 
 
 if __name__ == '__main__':
@@ -44,6 +59,8 @@ if __name__ == '__main__':
     window = App(mods)
     eventer = EventFilter(mods.keys())
     del mods
+    recv = threading.Thread(target=handler)
+    recv.start()
     window.installEventFilter(eventer)
     window.show()
     sys.exit(app.exec_())

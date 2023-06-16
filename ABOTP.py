@@ -8,12 +8,13 @@ class Client:
     def __init__(self, family: Optional[int] = socket.AF_INET):
 
         self.address = None
-
+        self.status = False
         self.sock = socket.socket(family, socket.SOCK_STREAM)
 
     def connect(self, address: tuple) -> None:
 
         self.sock.connect(address)
+        self.status = True
 
     def recv(self) -> List[bytes]:
 
@@ -61,6 +62,7 @@ class Client:
     def close(self):
 
         self.sock.close()
+        self.status = False
 
     def __del__(self):
 

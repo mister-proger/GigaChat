@@ -41,3 +41,4 @@ def importer():
 
 
 mods = importer()
+print(mods)
