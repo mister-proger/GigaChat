@@ -85,7 +85,11 @@ def handle_client(conn):
 
         head = packet[0].decode()
 
-        if head == 'AUDIO':
+        if head == 'ping':
+
+            conn.send(['system'.encode(), 'pong'.encode()])
+
+        elif head == 'audio':
 
             for client in clients:
 
@@ -196,7 +200,7 @@ def console():
 
         try:
 
-            command = input().split(' ')
+            command = input().split()
 
             if command[0] == 'kick':
 
@@ -217,14 +221,10 @@ def console():
             print('Неверная команда')
 
 
-command_thread = threading.Thread(target = console)
-
-command_thread.start()
+threading.Thread(target = console).start()
 
 while True:
 
     connection, addr = socket.accept()
 
-    client_thread = threading.Thread(target = handle_client, args = (connection,))
-
-    client_thread.start()
+    threading.Thread(target = handle_client, args = (connection,)).start()
