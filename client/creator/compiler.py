@@ -4,7 +4,7 @@ import struct
 
 code = './compile/code.py'
 info = './compile/info.json'
-output = r'C:\Users\Fluorum\PycharmProjects\GigaChat\client\mods\mess'
+output = r'C:\Users\Fluorum\PycharmProjects\GigaChat\client\mods\ms-audio'
 
 f_code = open(code, 'r')
 f_info = open(info, 'r')

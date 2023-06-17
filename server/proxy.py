@@ -9,7 +9,11 @@ clients = []
 def handler(conn):
     print(f'{conn} подключился')
     while True:
-        data = conn.recv()
+        try:
+            data = conn.recv()
+        except ConnectionResetError:
+            print(f'{conn} отключился')
+            break
         print(data)
         if not data:
             clients.remove(conn)

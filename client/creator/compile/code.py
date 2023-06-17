@@ -1,79 +1,67 @@
-import datetime
-import json
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QTextOption
-from PyQt5.QtWidgets import QWidget, QVBoxLayout, QHBoxLayout, QTextEdit, QLineEdit, QPushButton
+import threading
+
+import pyaudio
+from PyQt5.QtWidgets import QWidget, QCheckBox, QVBoxLayout
 
 
 class Main:
-    def __init__(self, socket, lang='RU_ru'):
+    def __init__(self, socket):
         self.socket = socket
-        self.lang = lang
-
         self.widget = QWidget()
         self.widgets = {
-            'layouts': {
-                'main': QVBoxLayout(),
-                'input': QHBoxLayout()
+            'checkboxes': {
+                'play': QCheckBox("Play"),
+                'handler': QCheckBox("Handler")
             },
-            'show': QTextEdit(),
-            'input': {
-                'mess': QLineEdit(),
-                'button': QPushButton('Send'),
-                'recipient': QLineEdit()
-            }
+            'layout': QVBoxLayout()
         }
 
-        self.widgets['show'].setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
-        self.widgets['show'].setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
-        self.widgets['show'].setWordWrapMode(QTextOption.NoWrap)
-        self.widgets['show'].setReadOnly(True)
-        self.widgets['input']['button'].clicked.connect(self.send)
-        self.widgets['input']['recipient'].setMaximumWidth(220)
+        self.audio = {
+            'format': pyaudio.paInt16,
+            'channels': 2,
+            'rate': 44100,
+            'frames_per_buffer': 1024
+        }
 
-        self.widgets['layouts']['input'].addWidget(self.widgets['input']['mess'])
-        self.widgets['layouts']['input'].addWidget(self.widgets['input']['button'])
-        self.widgets['layouts']['input'].addWidget(self.widgets['input']['recipient'])
-        self.widgets['layouts']['main'].addWidget(self.widgets['show'])
-        self.widgets['layouts']['main'].addLayout(self.widgets['layouts']['input'])
+        self.widgets['checkboxes']['play'].stateChanged.connect(self.changer)
+        self.widgets['checkboxes']['handler'].stateChanged.connect(self.changer)
 
-        self.widget.setLayout(self.widgets['layouts']['main'])
+        self.widgets['layout'].addWidget(self.widgets['checkboxes']['handler'])
+        self.widgets['layout'].addWidget(self.widgets['checkboxes']['play'])
+        self.widget.setLayout(self.widgets['layout'])
 
-    def send(self):
-        mess = self.widgets['input']['mess'].text()
-        recipient = self.widgets['input']['recipient'].text()
+        self.thread_send = threading.Thread(target=self.sender)
 
-        if not mess or not self.socket.status:
-            return
+        self.p = pyaudio.PyAudio()
+        self.streams = {
+            'input': self.p.open(
+                **(self.audio | {'input': True})
+            ),
+            'output': self.p.open(
+                **(self.audio | {'output': True})
+            ),
+        }
 
-        try:
-            if not recipient:
-                self.socket.send(['mess'.encode(), json.dumps({
-                    'text': mess,
-                    'sender': 'Me',
-                    'recipient': 'all'
-                }).encode()])
-            else:
-                self.socket.send(['mess'.encode(), json.dumps({
-                    'text': mess,
-                    'sender': 'Me',
-                    'recipient': recipient
-                }).encode()])
+        self.thread_send.start()
 
-            self.widgets['input']['mess'].clear()
-        except OSError as error:
-            self.widgets['show'].append(f'----- SENDING ERROR {error} -----')
+    def sender(self):
+        while threading.main_thread().is_alive():
+            if not self.socket.status:
+                continue
+            self.socket.send([
+                'ms-audio'.encode(),
+                self.streams['input'].read(self.audio['frames_per_buffer'])
+            ])
 
     def handler(self, packet):
-        mess = json.loads(packet[1].decode())
-        time = f'<{datetime.datetime.now().strftime("%H:%M")}>'
+        self.streams['output'].write(packet[1])
 
-        if mess['recipient'] == 'all':
-            opp = mess['sender']
+    def changer(self):
+        if not self.widgets['checkboxes']['play'].isChecked():
+            self.widgets['checkboxes']['handler'].setChecked(False)
+            self.widgets['checkboxes']['handler'].setEnabled(False)
         else:
-            opp = f"{mess['sender']} -> {mess['recipient']}"
-
-        self.widgets['show'].append(time + ' ' + opp + ': ' + mess['text'])
+            self.widgets['checkboxes']['handler'].setEnabled(True)
 
     def layout(self):
         return self.widget

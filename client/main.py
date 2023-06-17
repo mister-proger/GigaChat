@@ -1,9 +1,17 @@
 import sys
 import threading
 from PyQt5.QtCore import QEvent, QObject
+from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QMainWindow, QTabWidget, QApplication
 import ABOTP
 import handler
+import ctypes
+import os
+
+
+if os.name == 'nt':
+    ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID('MrCompany.GigaChat')
+del os
 
 
 mods = handler.mods
@@ -18,16 +26,13 @@ class EventFilter(QObject):
         self.tabs = tabs
 
     def eventFilter(self, obj, event):
-        if isinstance(obj, QTabWidget):
-            if event.type() == QEvent.Show:
-                index = obj.currentIndex()
-                print("Current Tab Index:", index)
         return super().eventFilter(obj, event)
 
 
 class App(QMainWindow):
     def __init__(self, mods):
         super().__init__()
+        self.setWindowIcon(QIcon('GigaChad.ico'))
         self.mods = mods
         self.tab = QTabWidget()
         self.setCentralWidget(self.tab)
@@ -35,10 +40,8 @@ class App(QMainWindow):
 
     def start_setup(self):
         for key, value in self.mods.items():
-            print(key, value['code'], mods, sep = ' | ')
             self.mods[key]['widget'] = value['code'](sock)
             self.tab.addTab(self.mods[key]['widget'].layout(), key)
-        print('О да', mods)
 
     def handler(self, data):
         if data[0].decode() in self.mods.keys():
