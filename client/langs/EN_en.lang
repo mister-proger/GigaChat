@@ -1,7 +1,0 @@
-name=nickname
-host=address
-port=port
-connect=connect
-send=send
-chat=chat
-param=parameters
