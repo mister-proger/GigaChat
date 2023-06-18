@@ -1,10 +1,10 @@
 {
-  "authors": [
-    {
-      "mail": "savnil@ya.ru",
-      "name": "MrSvinia"
-    }
-  ],
-  "id": "ms-audio",
-  "name": "Audio translator"
+    "authors": [
+        {
+            "mail": "savnil@ya.ru",
+            "name": "MrSvinia"
+        }
+    ],
+    "id": "ms-audio",
+    "name": "Audio translator"
 }

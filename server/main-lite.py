@@ -1,7 +1,9 @@
 import ABOTP
 import threading
+import loader
 
-HOST, PORT = '127.0.0.1', 1042
+
+properties = loader.properties_loader('./server.properties')
 
 clients = []
 
@@ -11,7 +13,7 @@ def handler(conn):
     while True:
         try:
             data = conn.recv()
-        except ConnectionResetError:
+        except (ConnectionResetError, TypeError):
             print(f'{conn} отключился')
             break
         print(data)
@@ -23,14 +25,17 @@ def handler(conn):
             for client in clients:
                 try:
                     client.send(data)
-                except ConnectionResetError:
+                except (ConnectionResetError, BrokenPipeError):
                     print(f'{client} отключился')
                     clients.remove(client)
 
 
 sock = ABOTP.Server()
-sock.bind((HOST, PORT))
+sock.bind((properties['HOST'], properties['PORT']))
 sock.listen()
+
+print(f'Сервер запущен на {properties["HOST"]}:{properties["PORT"]}')
+
 while True:
     conn, addr = sock.accept()
     clients.append(conn)

@@ -1,7 +1,7 @@
 import threading
-
 import pyaudio
 from PyQt5.QtWidgets import QWidget, QCheckBox, QVBoxLayout
+# import webrtcvad
 
 
 class Main:
@@ -18,10 +18,12 @@ class Main:
 
         self.audio = {
             'format': pyaudio.paInt16,
-            'channels': 2,
-            'rate': 44100,
-            'frames_per_buffer': 1024
+            'channels': 1,
+            'rate': 32000,
+            'frames_per_buffer': 1024,
         }
+        # self.vad = webrtcvad.Vad()
+        self.vad.set_mode(3)
 
         self.widgets['checkboxes']['play'].stateChanged.connect(self.changer)
         self.widgets['checkboxes']['handler'].stateChanged.connect(self.changer)
@@ -43,18 +45,23 @@ class Main:
         }
 
         self.thread_send.start()
+        self.changer()
 
     def sender(self):
         while threading.main_thread().is_alive():
             if not self.socket.status:
                 continue
-            self.socket.send([
-                'ms-audio'.encode(),
-                self.streams['input'].read(self.audio['frames_per_buffer'])
-            ])
+            if self.widgets['checkboxes']['handler'].isChecked():
+                audio = self.streams['input'].read(self.audio['frames_per_buffer'])
+                # if self.vad.is_speech(audio, self.audio['rate']):
+                self.socket.send([
+                    'ms-audio'.encode(),
+                    audio
+                ])
 
     def handler(self, packet):
-        self.streams['output'].write(packet[1])
+        if self.widgets['checkboxes']['play'].isChecked():
+            self.streams['output'].write(packet[1])
 
     def changer(self):
         if not self.widgets['checkboxes']['play'].isChecked():

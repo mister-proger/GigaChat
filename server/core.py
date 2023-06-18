@@ -1,5 +1,4 @@
 import ABOTP
-import struct
 import threading
 import json
 

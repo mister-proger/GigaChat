@@ -1,19 +1,16 @@
-import sys
-import threading
-from PyQt5.QtCore import QEvent, QObject
-from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QMainWindow, QTabWidget, QApplication
-import ABOTP
-import handler
 import ctypes
 import os
-
+import sys
+import threading
+import ABOTP
+import handler
+from PyQt5.QtCore import QObject
+from PyQt5.QtGui import QIcon
+from PyQt5.QtWidgets import QMainWindow, QTabWidget, QApplication
 
 if os.name == 'nt':
     ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID('MrCompany.GigaChat')
 del os
-
-
 mods = handler.mods
 del handler
 
@@ -42,6 +39,7 @@ class App(QMainWindow):
         for key, value in self.mods.items():
             self.mods[key]['widget'] = value['code'](sock)
             self.tab.addTab(self.mods[key]['widget'].layout(), key)
+            del self.mods[key]['code']
 
     def handler(self, data):
         if data[0].decode() in self.mods.keys():
