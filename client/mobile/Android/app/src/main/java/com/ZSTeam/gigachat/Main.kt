@@ -1,4 +1,4 @@
-package com.ZSTeam.gigachat
+package com.zsteam.gigachat
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle

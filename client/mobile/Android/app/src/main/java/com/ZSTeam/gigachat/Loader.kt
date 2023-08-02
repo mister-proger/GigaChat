@@ -1,4 +1,4 @@
-package com.ZSTeam.gigachat
+package com.zsteam.gigachat
 
 import android.os.Bundle
 import android.widget.Button
@@ -18,13 +18,6 @@ class Loader : AppCompatActivity() {
     }
 
     private fun widgetSettings() {
-        val sendButton = findViewById<Button>(R.id.sendButton)
-        val inputText = findViewById<EditText>(R.id.inputText)
-        val viewText = findViewById<TextView>(R.id.viewText)
-        sendButton.setOnClickListener {
-            runBlocking {
-                client.sendMessage(inputText.text.toString(), viewText)
-            }
-        }
+
     }
 }
