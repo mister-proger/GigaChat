@@ -59,8 +59,10 @@ def auth(request):
     login = data.get('login', None)
     password = data.get('password', None)
     if login is not None and password is not None:
-        login = login[0];
+        login = login[0]
         password = password[0]
+    else:
+        return HttpResponse("Ошибка в параметрах запроса!")
 
     response = DBOperator.check_user(login, password)
 
