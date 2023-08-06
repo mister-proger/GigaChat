@@ -1,0 +1,11 @@
+E:\download\Git\GigaChat\client\desktop\windows\bin\Debug\GigaChat.exe.config
+E:\download\Git\GigaChat\client\desktop\windows\bin\Debug\GigaChat.exe
+E:\download\Git\GigaChat\client\desktop\windows\bin\Debug\GigaChat.pdb
+E:\download\Git\GigaChat\client\desktop\windows\obj\Debug\GigaChat.csproj.AssemblyReference.cache
+E:\download\Git\GigaChat\client\desktop\windows\obj\Debug\GigaChat.csproj.SuggestedBindingRedirects.cache
+E:\download\Git\GigaChat\client\desktop\windows\obj\Debug\GigaChat.Properties.Resources.resources
+E:\download\Git\GigaChat\client\desktop\windows\obj\Debug\GigaChat.csproj.GenerateResource.cache
+E:\download\Git\GigaChat\client\desktop\windows\obj\Debug\GigaChat.csproj.CoreCompileInputs.cache
+E:\download\Git\GigaChat\client\desktop\windows\obj\Debug\GigaChat.exe
+E:\download\Git\GigaChat\client\desktop\windows\obj\Debug\GigaChat.pdb
+E:\download\Git\GigaChat\client\desktop\windows\obj\Debug\GigaChat.winRegister.resources
