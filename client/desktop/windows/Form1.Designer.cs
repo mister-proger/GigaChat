@@ -145,26 +145,32 @@ namespace GigaChat
             // 
             this.passwordVisCheckBox.AutoSize = true;
             this.passwordVisCheckBox.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(58)))), ((int)(((byte)(105)))), ((int)(((byte)(243)))));
-            this.passwordVisCheckBox.Font = new System.Drawing.Font("Comic Sans MS", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.passwordVisCheckBox.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.passwordVisCheckBox.Font = new System.Drawing.Font("Comic Sans MS", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.passwordVisCheckBox.Location = new System.Drawing.Point(484, 287);
             this.passwordVisCheckBox.Name = "passwordVisCheckBox";
-            this.passwordVisCheckBox.Size = new System.Drawing.Size(115, 20);
+            this.passwordVisCheckBox.Size = new System.Drawing.Size(113, 19);
             this.passwordVisCheckBox.TabIndex = 8;
             this.passwordVisCheckBox.Text = "показать пароль";
             this.passwordVisCheckBox.UseVisualStyleBackColor = false;
             this.passwordVisCheckBox.Click += new System.EventHandler(this.passwordVisCheckBox_Click);
+            this.passwordVisCheckBox.MouseLeave += new System.EventHandler(this.passwordVisCheckBox_MouseLeave);
+            this.passwordVisCheckBox.MouseHover += new System.EventHandler(this.passwordVisCheckBox_MouseHover);
             // 
             // registerReg
             // 
             this.registerReg.AutoSize = true;
             this.registerReg.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(58)))), ((int)(((byte)(105)))), ((int)(((byte)(243)))));
-            this.registerReg.Font = new System.Drawing.Font("Comic Sans MS", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.registerReg.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.registerReg.Font = new System.Drawing.Font("Comic Sans MS", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)), true);
             this.registerReg.Location = new System.Drawing.Point(355, 363);
             this.registerReg.Name = "registerReg";
-            this.registerReg.Size = new System.Drawing.Size(106, 16);
+            this.registerReg.Size = new System.Drawing.Size(102, 15);
             this.registerReg.TabIndex = 9;
             this.registerReg.Text = "еще нет аккаунта?";
             this.registerReg.Click += new System.EventHandler(this.registerReg_Click);
+            this.registerReg.MouseLeave += new System.EventHandler(this.registerReg_MouseLeave);
+            this.registerReg.MouseHover += new System.EventHandler(this.registerReg_MouseHover);
             // 
             // winRegister
             // 

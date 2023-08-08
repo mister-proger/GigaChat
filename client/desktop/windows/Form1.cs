@@ -29,17 +29,37 @@ namespace GigaChat
 
         private void exitReg_MouseLeave(object sender, EventArgs e)
         {
-            exitReg.BackColor = Color.FromArgb(0, 162, 232); ;
-        }
-
-        private void passwordVisCheckBox_Click(object sender, EventArgs e)
-        {
-            passwordBoxReg.UseSystemPasswordChar = (!passwordBoxReg.UseSystemPasswordChar) ? true : false;
+            exitReg.BackColor = Color.FromArgb(0, 162, 232); 
         }
 
         private void registerReg_Click(object sender, EventArgs e)
         {
             this.Hide();
+        }
+
+        private void registerReg_MouseHover(object sender, EventArgs e)
+        {
+            registerReg.Font = new Font("Comic Sans MS",8,FontStyle.Underline);
+        }
+
+        private void registerReg_MouseLeave(object sender, EventArgs e)
+        {
+            registerReg.Font = new Font("Comic Sans MS",8);
+        }
+
+        private void passwordVisCheckBox_MouseHover(object sender, EventArgs e)
+        {
+            passwordVisCheckBox.Font = new Font("Comic Sans MS", 8, FontStyle.Underline);
+        }
+
+        private void passwordVisCheckBox_MouseLeave(object sender, EventArgs e)
+        {
+            passwordVisCheckBox.Font = new Font("Comic Sans MS", 8);
+        }
+
+        private void passwordVisCheckBox_Click(object sender, EventArgs e)
+        {
+            passwordBoxReg.UseSystemPasswordChar = (!passwordBoxReg.UseSystemPasswordChar) ? true : false;
         }
     }
 }
