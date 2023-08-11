@@ -30,7 +30,6 @@ namespace GigaChat
         /// </summary>
         private void InitializeComponent()
         {
-            this.exitReg = new System.Windows.Forms.Label();
             this.WelcomeBackReg = new System.Windows.Forms.Label();
             this.LogInLabelReg = new System.Windows.Forms.Label();
             this.loginBoxReg = new System.Windows.Forms.TextBox();
@@ -40,25 +39,8 @@ namespace GigaChat
             this.LOGINbuttonReg = new System.Windows.Forms.Button();
             this.passwordVisCheckBox = new System.Windows.Forms.CheckBox();
             this.registerReg = new System.Windows.Forms.Label();
+            this.exitReg = new System.Windows.Forms.Button();
             this.SuspendLayout();
-            // 
-            // exitReg
-            // 
-            this.exitReg.AutoSize = true;
-            this.exitReg.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(162)))), ((int)(((byte)(232)))));
-            this.exitReg.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.exitReg.Font = new System.Drawing.Font("Comic Sans MS", 14F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.exitReg.ForeColor = System.Drawing.Color.Black;
-            this.exitReg.Location = new System.Drawing.Point(762, -2);
-            this.exitReg.Name = "exitReg";
-            this.exitReg.Size = new System.Drawing.Size(23, 27);
-            this.exitReg.TabIndex = 0;
-            this.exitReg.Text = "x";
-            this.exitReg.TextAlign = System.Drawing.ContentAlignment.TopRight;
-            this.exitReg.UseMnemonic = false;
-            this.exitReg.Click += new System.EventHandler(this.exitReg_Click);
-            this.exitReg.MouseLeave += new System.EventHandler(this.exitReg_MouseLeave);
-            this.exitReg.MouseHover += new System.EventHandler(this.exitReg_MouseHover);
             // 
             // WelcomeBackReg
             // 
@@ -172,12 +154,35 @@ namespace GigaChat
             this.registerReg.MouseLeave += new System.EventHandler(this.registerReg_MouseLeave);
             this.registerReg.MouseHover += new System.EventHandler(this.registerReg_MouseHover);
             // 
+            // exitReg
+            // 
+            this.exitReg.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.exitReg.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(162)))), ((int)(((byte)(232)))));
+            this.exitReg.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
+            this.exitReg.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.exitReg.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(162)))), ((int)(((byte)(232)))));
+            this.exitReg.FlatAppearance.BorderSize = 0;
+            this.exitReg.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.exitReg.Font = new System.Drawing.Font("Comic Sans MS", 14F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.exitReg.ForeColor = System.Drawing.Color.Black;
+            this.exitReg.Location = new System.Drawing.Point(750, -3);
+            this.exitReg.Name = "exitReg";
+            this.exitReg.Size = new System.Drawing.Size(34, 34);
+            this.exitReg.TabIndex = 10;
+            this.exitReg.Text = "x";
+            this.exitReg.TextAlign = System.Drawing.ContentAlignment.TopRight;
+            this.exitReg.UseVisualStyleBackColor = false;
+            this.exitReg.Click += new System.EventHandler(this.exitReg_Click);
+            this.exitReg.MouseLeave += new System.EventHandler(this.exitReg_MouseLeave);
+            this.exitReg.MouseHover += new System.EventHandler(this.exitReg_MouseHover);
+            // 
             // winRegister
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.BackgroundImage = global::GigaChat.Properties.Resources.RegisterBG;
             this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
             this.ClientSize = new System.Drawing.Size(784, 500);
+            this.Controls.Add(this.exitReg);
             this.Controls.Add(this.registerReg);
             this.Controls.Add(this.passwordVisCheckBox);
             this.Controls.Add(this.LOGINbuttonReg);
@@ -187,7 +192,7 @@ namespace GigaChat
             this.Controls.Add(this.loginBoxReg);
             this.Controls.Add(this.LogInLabelReg);
             this.Controls.Add(this.WelcomeBackReg);
-            this.Controls.Add(this.exitReg);
+            this.Cursor = System.Windows.Forms.Cursors.Arrow;
             this.ForeColor = System.Drawing.Color.White;
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.Name = "winRegister";
@@ -201,7 +206,6 @@ namespace GigaChat
         }
 
         #endregion
-        private System.Windows.Forms.Label exitReg;
         private System.Windows.Forms.Label WelcomeBackReg;
         private System.Windows.Forms.Label LogInLabelReg;
         private System.Windows.Forms.TextBox loginBoxReg;
@@ -211,6 +215,7 @@ namespace GigaChat
         private System.Windows.Forms.Button LOGINbuttonReg;
         private System.Windows.Forms.CheckBox passwordVisCheckBox;
         private System.Windows.Forms.Label registerReg;
+        private System.Windows.Forms.Button exitReg;
     }
 }
 
