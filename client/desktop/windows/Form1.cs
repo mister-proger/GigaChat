@@ -61,5 +61,19 @@ namespace GigaChat
         {
             passwordBoxReg.UseSystemPasswordChar = (!passwordBoxReg.UseSystemPasswordChar) ? true : false;
         }
+
+        Point lastPoint;
+        private void winRegister_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Left)
+            {
+                this.Left += e.X - lastPoint.X;
+                this.Top += e.Y - lastPoint.Y;
+            }
+        }
+        private void winRegister_MouseDown(object sender, MouseEventArgs e)
+        {
+            lastPoint = new Point(e.X,e.Y);
+        }
     }
 }

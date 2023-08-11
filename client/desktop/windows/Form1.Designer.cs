@@ -193,6 +193,8 @@ namespace GigaChat
             this.Name = "winRegister";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "GigaChat --Register";
+            this.MouseDown += new System.Windows.Forms.MouseEventHandler(this.winRegister_MouseDown);
+            this.MouseMove += new System.Windows.Forms.MouseEventHandler(this.winRegister_MouseMove);
             this.ResumeLayout(false);
             this.PerformLayout();
 
