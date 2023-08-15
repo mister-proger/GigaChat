@@ -21,7 +21,7 @@ Widget::Widget(QWidget *parent)
 
 Widget::~Widget()
 {
-
+    qInfo() << "destroyed" << this;
 }
 
 void Widget::OnAuthentication(bool success)
