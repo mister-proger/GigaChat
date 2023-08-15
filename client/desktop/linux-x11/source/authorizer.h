@@ -11,9 +11,10 @@
 #include <QPushButton>
 #include <QSvgWidget>
 #include <QLineEdit>
-#include "nonewlineqlineedit.h"
+#include "utils/nonewlineqlineedit.h"
 #include <QWidget>
 #include <QLabel>
+
 
 //layouts
 #include <QHBoxLayout>

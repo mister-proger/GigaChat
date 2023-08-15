@@ -3,7 +3,7 @@
 
 #include "authorizer.h"
 #include "userinterface.h"
-#include "recentevent.h"
+#include "utils/recentevent.h"
 
 #include <QObject>
 

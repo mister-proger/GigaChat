@@ -24,9 +24,9 @@ HEADERS += \
     mainwidgets/gridscrollingwidget.h \
     mainwidgets/scrollingwidget.h \
     mainwidgets/undefinedpage.h \
-    nonewlineqlineedit.h \
-    recentevent.h \
     userinterface.h \
+    utils/nonewlineqlineedit.h \
+    utils/recentevent.h \
     widget.h
 
 # Default rules for deployment.
