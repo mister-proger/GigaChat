@@ -41,8 +41,9 @@ void Authorizer::InputField::SetupLayout()
         //All widgets must take as much space as they can";
         Layout->itemAt(i)->widget()->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
         qDebug().quote() << Layout->itemAt(i)->widget()->objectName();
-
+    
     }
+    
 }
 void Authorizer::InputField::InitializeConnections(QWidget* parent)
 {
@@ -89,7 +90,7 @@ Authorizer::Authorizer(QWidget *parent) : QSvgWidget{parent}
 #ifdef QT_DEBUG
     setStyleSheet("border: 5px solid red");
 #endif
-    setMinimumSize(666, 400);
+    setMinimumSize(1366, 768);
     load(BGImagePath);
     Field = new InputField(this);
     Field->Reposition(geometry()); //this->geometry()
