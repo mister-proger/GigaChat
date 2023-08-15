@@ -11,6 +11,9 @@ CONFIG += c++23
 SOURCES += \
     authorizer.cpp \
     main.cpp \
+    mainwidgets/gridscrollingwidget.cpp \
+    mainwidgets/scrollingwidget.cpp \
+    mainwidgets/undefinedpage.cpp \
     nonewlineqlineedit.cpp \
     recentevent.cpp \
     userinterface.cpp \
@@ -18,6 +21,9 @@ SOURCES += \
 
 HEADERS += \
     authorizer.h \
+    mainwidgets/gridscrollingwidget.h \
+    mainwidgets/scrollingwidget.h \
+    mainwidgets/undefinedpage.h \
     nonewlineqlineedit.h \
     recentevent.h \
     userinterface.h \
