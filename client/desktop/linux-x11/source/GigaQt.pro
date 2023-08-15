@@ -14,9 +14,9 @@ SOURCES += \
     mainwidgets/gridscrollingwidget.cpp \
     mainwidgets/scrollingwidget.cpp \
     mainwidgets/undefinedpage.cpp \
-    nonewlineqlineedit.cpp \
-    recentevent.cpp \
     userinterface.cpp \
+    utils/nonewlineqlineedit.cpp \
+    utils/recentevent.cpp \
     widget.cpp
 
 HEADERS += \

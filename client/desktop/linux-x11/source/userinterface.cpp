@@ -16,6 +16,7 @@ void UserInterface::constructTabWidget()
         qDebug() << Icon << Title << Widget;
     }
 }
+
 UserInterface::UserInterface(QWidget *parent) : QTabWidget{parent}
 {
     constructWindowArray();
