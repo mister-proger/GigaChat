@@ -10,9 +10,9 @@ void Authorizer::InputField::CreateWidgets(QWidget* parent)
                    parentSize.height()/resizeFactorV);
 
     Layout = new QGridLayout(Widget);
-    Username = new QLineEdit(tr("Username goes here,"));
-    Password = new QLineEdit(tr("Password - here..."));
-    Captcha  = new QLineEdit(tr("...and Captcha - here."));
+    Username = new NoNewLineQLineEdit(tr("Username goes here,"));
+    Password = new NoNewLineQLineEdit(tr("Password - here..."));
+    Captcha  = new NoNewLineQLineEdit(tr("...and Captcha - here."));
     ChangeCaptcha = new QPushButton(tr("Change\ncaptcha"));
     
     SubmitBG = new QSvgWidget(":/resources/LoginBN.svg");
@@ -51,6 +51,9 @@ void Authorizer::InputField::InitializeConnections(QWidget* parent)
     connect(Submit, SIGNAL(clicked()),
             parent, SLOT(OnSubimtClicked()),
             Qt::DirectConnection);
+    connect(Username, SIGNAL(EnterPressed()), Password, SLOT(setFocus()));
+    connect(Password, SIGNAL(EnterPressed()), Captcha , SLOT(setFocus()));
+    connect(Captcha , SIGNAL(EnterPressed()), Submit  , SLOT(click()));
 }
 Authorizer::InputField::InputField(QWidget* parent)
 {
@@ -122,3 +125,24 @@ void Authorizer::resizeEvent(QResizeEvent *e)
     qDebug() << "\e[31mresize event triggered\e[0m";
     Field->Reposition(geometry()); //this->geometry()
 }
+
+/*
+void Authorizer::keyPressEvent(QKeyEvent *event)
+{
+    if (event->key() == Qt::Key_Enter) goto enter_event;
+    QSvgWidget::keyPressEvent(event);
+    return;
+        
+enter_event:
+    if (Field->Username->hasFocus())
+    {
+        Field->Password->setFocus();
+        return;
+    }
+    if (Field->Password->hasFocus())
+    {
+        emit Field->Submit->clicked(true);
+    }
+    event->accept();
+}
+*/

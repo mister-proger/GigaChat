@@ -1,25 +1,34 @@
 #pragma once
 
 #include <QObject>
-#include <QThread>
 
 //utility classes
-#include <QString>
 #include <QStringView>
+#include <QString>
 #include <QPixmap>
 
 //widgets
-#include <QWidget>
-#include <QLabel>
-#include <QLineEdit>
 #include <QPushButton>
 #include <QSvgWidget>
+#include <QLineEdit>
+#include "nonewlineqlineedit.h"
+#include <QWidget>
+#include <QLabel>
 
 //layouts
 #include <QHBoxLayout>
 #include <QGridLayout>
 #include <QSizePolicy>
+
+//events
 #include <QResizeEvent>
+#include <QKeyEvent>
+
+//network
+#include <QNetworkAccessManager>
+#include <QNetworkRequest>
+#include <QNetworkReply>
+#include <QUrl>
 
 class Authorizer : public QSvgWidget
 {
@@ -41,9 +50,9 @@ private:
         QWidget *Widget;
         QGridLayout *Layout;
         //QSizePolicy Alignment;
-        QLineEdit *Username,
-                  *Password,
-                  *Captcha;
+        NoNewLineQLineEdit *Username,
+                           *Password,
+                           *Captcha;
         QSvgWidget* SubmitBG;
         QPushButton *Submit,
                     *ChangeCaptcha;
@@ -59,6 +68,7 @@ private:
 
 protected:
     void resizeEvent(QResizeEvent* e) override;
+    //void keyPressEvent(QKeyEvent *event) override;
 
 public:
     explicit Authorizer(QWidget *parent = nullptr);

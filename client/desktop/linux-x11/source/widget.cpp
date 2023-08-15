@@ -6,7 +6,7 @@ void Widget::InitializeConnections()
 
     connect(HelloScreen, &Authorizer::AuthenticationComplete,
             this, &Widget::OnAuthentication,
-            Qt::QueuedConnection); //IF I ENABLE MULTITHREADING
+            Qt::DirectConnection);
 }
 
 Widget::Widget(QWidget *parent)
@@ -14,20 +14,35 @@ Widget::Widget(QWidget *parent)
 {
     AuthorizeControl = new QStackedLayout(this);
     HelloScreen = new Authorizer();
+    
+    EventsAndUI = new QWidget();
+    EventsAndUILayout = new QHBoxLayout(EventsAndUI);
+    UI = new UserInterface();
+    recentEvents = new QListView();
+    EventsAndUILayout->addWidget(recentEvents, 1);
+    EventsAndUILayout->addWidget(UI, 9);
+    
     AuthorizeControl->addWidget(HelloScreen);
-    AuthorizeControl->addWidget(temporar);
+    AuthorizeControl->addWidget(EventsAndUI);
+    
     InitializeConnections();
 }
 
 Widget::~Widget()
 {
-    qInfo() << "destroyed" << this;
 }
 
 void Widget::OnAuthentication(bool success)
 {
-    qDebug() << "today is a good day, since \e[31mON_AUTHENTICATION function works!\e[0m";
-    qDebug() << (success ? "\e[96mDA SUCCESS\e[0m" : "\e[96mDA NOT SUCCESS\e[0m");
     AuthorizeControl->setCurrentIndex(success);
+    /*
+    it could have been
+    enum struct ScreenType
+    {
+        AuthorizeScreen = 0,
+        ApplicationScreen = 1
+    };
+    but... enums are not convertible to ints...
+    */
 }
 

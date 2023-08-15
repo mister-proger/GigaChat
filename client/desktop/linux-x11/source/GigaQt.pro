@@ -2,7 +2,7 @@ QT       += core gui svgwidgets network
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-CONFIG += c++20
+CONFIG += c++23
 
 # You can make your code fail to compile if it uses deprecated APIs.
 # In order to do so, uncomment the following line.
@@ -11,10 +11,16 @@ CONFIG += c++20
 SOURCES += \
     authorizer.cpp \
     main.cpp \
+    nonewlineqlineedit.cpp \
+    recentevent.cpp \
+    userinterface.cpp \
     widget.cpp
 
 HEADERS += \
     authorizer.h \
+    nonewlineqlineedit.h \
+    recentevent.h \
+    userinterface.h \
     widget.h
 
 # Default rules for deployment.

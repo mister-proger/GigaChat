@@ -2,27 +2,31 @@
 #define WIDGET_H
 
 #include "authorizer.h"
+#include "userinterface.h"
+#include "recentevent.h"
 
 #include <QObject>
+
+#include <QListView>
 #include <QWidget>
+
 #include <QStackedLayout>
-#include <QTabWidget>
+#include <QHBoxLayout>
 
 class Widget : public QWidget
 {
     Q_OBJECT
 
 private:
-
-    enum struct ScreenType
-    {
-        AuthorizeScreen = 0,
-        ApplicationScreen = 1
-    };
     QStackedLayout* AuthorizeControl;
 
     Authorizer* HelloScreen;
-    QPushButton* temporar = new QPushButton("HAHAHAH"); // // // // // // //
+    
+    UserInterface* UI;
+    QListView* recentEvents;
+    
+    QWidget* EventsAndUI;
+    QHBoxLayout* EventsAndUILayout;
 
     void InitializeConnections();
 public:
