@@ -122,6 +122,7 @@ namespace GigaChat
             this.LOGINbuttonReg.TabIndex = 7;
             this.LOGINbuttonReg.Text = "войти";
             this.LOGINbuttonReg.UseVisualStyleBackColor = false;
+            this.LOGINbuttonReg.Click += new System.EventHandler(this.LOGINbuttonReg_Click);
             // 
             // passwordVisCheckBox
             // 

@@ -75,5 +75,26 @@ namespace GigaChat
         {
             lastPoint = new Point(e.X,e.Y);
         }
+        //мозготрах тут:
+        private void LOGINbuttonReg_Click(object sender, EventArgs e)
+        {
+            string LOGIN = loginBoxReg.Text;
+            string PASSWORD = passwordBoxReg.Text;
+            if (
+                !PASSWORD.Contains('0') &&
+                !PASSWORD.Contains('1') &&
+                !PASSWORD.Contains('2') &&
+                !PASSWORD.Contains('3') &&
+                !PASSWORD.Contains('4') &&
+                !PASSWORD.Contains('5') &&
+                !PASSWORD.Contains('6') &&
+                !PASSWORD.Contains('7') &&
+                !PASSWORD.Contains('8') &&
+                !PASSWORD.Contains('9')
+                )
+            {
+                MessageBox.Show("пароль должен содержать цифры!");
+            }
+        }
     }
 }
