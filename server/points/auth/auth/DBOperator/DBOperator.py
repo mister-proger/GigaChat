@@ -1,19 +1,20 @@
 import psycopg2
-import generator
 
+try:
+    from . import generator
+except ImportError:
+    import generator
 
 connection = psycopg2.connect(host='localhost', port=5432, user='postgres', password=_password)
 
 
 # debug
 def drop_all_tables():
-
     with connection.cursor() as cursor:
         cursor.execute("SELECT table_name FROM information_schema.tables WHERE table_schema='public';")
 
         for table in cursor.fetchall():
-            sql = "DROP TABLE IF EXISTS %s CASCADE" % (table[0])
-            cursor.execute(sql)
+            cursor.execute("DROP TABLE IF EXISTS %s CASCADE" % (table[0],))
 
     connection.commit()
 
@@ -70,12 +71,12 @@ def setup():
     connection.commit()
 
 
-def register(login, password, *, email = None, phone = None):
+def register(login, password, *, email=None, phone=None):
     cursor = connection.cursor()
 
     cursor.execute('''
         INSERT INTO users (name, password, email, phone) VALUES (%s, %s, %s, %s)
-    ''', (login, password, email, phone))
+    ''', (login, generator.hasher(password), email, phone))
 
     connection.commit()
 
@@ -86,10 +87,12 @@ def auth(login_type, login, password):
     cursor = connection.cursor()
 
     cursor.execute(f'''
-        SELECT password FROM users WHERE %s = %s
-    ''', (login_type, login))
-
-    return cursor.fetchone()[0] == generator.hash(password)
+        SELECT password FROM users WHERE {login_type} = %s
+    ''', (login,))
+    try:
+        return cursor.fetchone()[0] == generator.hasher(password)
+    except TypeError:
+        return False
 
 
 def check(login_type, login):
@@ -100,3 +103,27 @@ def check(login_type, login):
     ''', (login,))
 
     return cursor.fetchone()[0]
+
+
+def create_token(agent, id):
+    cursor = connection.cursor()
+
+    token = generator.gen_token(id)
+
+    cursor.execute('''
+            INSERT INTO tokens (id, client, token) VALUES (%s, %s, %s)
+        ''', (id, agent, token))
+
+    connection.commit()
+
+    return token
+
+
+def auth_token(token, agent, id):
+    cursor = connection.cursor()
+
+    cursor.execute('''
+                SELECT token FROM tokens WHERE id = %s AND agent = %s
+        ''', (token, id, agent))
+
+    return bool(cursor.fetchone())
