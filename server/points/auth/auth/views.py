@@ -1,78 +1,93 @@
-from django.http import HttpResponse
-import sqlite3
+import re
+
+from django.http import HttpResponseBadRequest, JsonResponse
+from . import DBOperator
 
 
-class DBOperator:
-    db_connect = sqlite3.connect(r'E:\Projects\GigaChat\server\test.db', check_same_thread=False)
+def validate_input(input_string):
+    phone_pattern = r'^\+[0-9]+$'
+    email_pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
 
-    @staticmethod
-    def check_user(login):
-        pass
-
-    @staticmethod
-    def register_user(login, password):
-
-        cursor = DBOperator.db_connect.cursor()
-
-        cursor.execute("SELECT MAX(id) FROM users")
-        max_id = cursor.fetchone()[0]
-        if max_id is None:
-            next_id = 1
-        else:
-            next_id = max_id + 1
-
-        cursor.execute("INSERT INTO users (id, login, password) VALUES (?, ?, ?)",
-                       (next_id, login, password))
-
-        DBOperator.db_connect.commit()
-
-        return next_id
-
-    @staticmethod
-    def auth_user(login, password):
-        cursor = DBOperator.db_connect.cursor()
-        cursor.execute("SELECT id FROM users WHERE login=? AND password=?", (login, password))
-        row = cursor.fetchone()
-        if row:
-            return row[0]
-        else:
-            return None
+    if re.match(phone_pattern, input_string):
+        return 'phone'
+    elif re.match(email_pattern, input_string):
+        return 'email'
+    else:
+        return 'name'
 
 
 def register(request):
-    data = dict(request.GET)
-    login = data.get('login', None)
-    password = data.get('password', None)
-    if login is not None and password is not None:
-        login = login[0];
-        password = password[0]
-    else:
-        return HttpResponse("Ошибка в параметрах запроса!")
+    if request.GET.get('login', None) is None \
+            or request.GET.get('password', None) is None \
+            or request.GET.get('contact', None) is None:
+        return JsonResponse({
+            'status': 'refused',
+            'reason': 'BadRequest',
+            'description': 'LackOfArguments'
+        }, status=400)
 
-    _id = DBOperator.register_user(login, password)
+    contact_type = validate_input(request.GET['contact'])
 
-    return HttpResponse(f"Ваш ID | {_id} |")
+    if contact_type is 'name':
+        return JsonResponse({
+            'status': 'refused',
+            'reason': 'BadRequest',
+            'description': 'NotValidContact'
+        }, status=400)
+
+    if DBOperator.operator.check(contact_type, request.GET['contact']):
+        return JsonResponse({
+            'status': 'refused',
+            'reason': 'BadRequest',
+            'description': 'ContactAlreadyRegistered'
+        }, status=400)
+
+    id = DBOperator.operator.register(
+        request.GET['login'],
+        request.GET['password'],
+        **{contact_type: request.GET['contact']}
+    )[0]
+
+    token = DBOperator.operator.create_token(request.META.get('HTTP_USER_AGENT'), id)
+
+    return JsonResponse({
+        'status': 'Done',
+        'auth-data': {
+            'id': id,
+            'token': token
+        },
+        'user-data': {
+            'name': request.GET['login'],
+            'id': id
+        }
+    })
 
 
 def auth(request):
-    data = dict(request.GET)
-    login = data.get('login', None)
-    password = data.get('password', None)
-    if login is not None and password is not None:
-        login = login[0]
-        password = password[0]
-    else:
-        return HttpResponse("Ошибка в параметрах запроса!")
+    if request.GET.get('login', None) is None \
+            or request.GET.get('password') is None:
+        return JsonResponse({
+            'status': 'refused',
+            'reason': 'BadRequest',
+            'description': 'LackOfArguments'
+        }, status=400)
 
-    response = DBOperator.check_user(login, password)
+    id = DBOperator.operator.check(validate_input(request.GET['login']), request.GET['login'])
 
-    if response is not None:
-        return HttpResponse(f"Авторизация прошла успешно, ваш ID | {response} |")
-    else:
-        return HttpResponse("Неверное имя пользователя или пароль")
+    if id is None:
+        return JsonResponse({
+            'status': 'refused',
+            'reason': 'BadRequest',
+            'description': 'UserNotFound'
+        }, status=400)
 
+    token = DBOperator.operator.create_token(request.META.get('HTTP_USER_AGENT'), id)
 
-def index(request):
-    print(request.GET)
-    print(request.POST)
-    return HttpResponse("Hello, world. You're at the polls index.")
+    return JsonResponse({
+        'status': 'Done',
+        'auth-data': {
+            'id': id,
+            'token': token
+        }
+    })
+

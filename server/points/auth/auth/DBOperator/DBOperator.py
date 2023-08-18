@@ -5,6 +5,7 @@ try:
 except ImportError:
     import generator
 
+
 connection = psycopg2.connect(host='localhost', port=5432, user='postgres', password=_password)
 
 
@@ -31,6 +32,8 @@ def check_all_tables():
 
 # debug
 def setup():
+    drop_all_tables()
+
     cursor = connection.cursor()
 
     cursor.execute('''
@@ -89,10 +92,8 @@ def auth(login_type, login, password):
     cursor.execute(f'''
         SELECT password FROM users WHERE {login_type} = %s
     ''', (login,))
-    try:
-        return cursor.fetchone()[0] == generator.hasher(password)
-    except TypeError:
-        return False
+
+    return cursor.fetchone() == generator.hasher(password)
 
 
 def check(login_type, login):
@@ -102,7 +103,7 @@ def check(login_type, login):
         SELECT id FROM users WHERE {login_type} = %s
     ''', (login,))
 
-    return cursor.fetchone()[0]
+    return cursor.fetchone()
 
 
 def create_token(agent, id):
@@ -111,8 +112,8 @@ def create_token(agent, id):
     token = generator.gen_token(id)
 
     cursor.execute('''
-            INSERT INTO tokens (id, client, token) VALUES (%s, %s, %s)
-        ''', (id, agent, token))
+        INSERT INTO tokens (id, client, token) VALUES (%s, %s, %s)
+    ''', (id, agent, generator.hasher(token)))
 
     connection.commit()
 
@@ -123,7 +124,9 @@ def auth_token(token, agent, id):
     cursor = connection.cursor()
 
     cursor.execute('''
-                SELECT token FROM tokens WHERE id = %s AND agent = %s
-        ''', (token, id, agent))
+        SELECT *
+        FROM tokens
+        WHERE id = %s AND agent = %s AND token = %s
+    ''', (id, agent, generator.hasher(token)))
 
     return bool(cursor.fetchone())
