@@ -6,6 +6,9 @@
 #include <optional>
 #ifdef QT_DEBUG
     #include <iostream>
+    #define DEBUG(str) qDebug() << str
+#else
+    #define DEBUG(str) 
 #endif
 
 //utility classes
@@ -13,6 +16,7 @@
 #include <QByteArray>
 #include <QString>
 #include <QPixmap>
+#include <QDebug>
 
 //widgets
 #include <QPushButton>
@@ -92,9 +96,7 @@ signals:
     void successfullyAuthorized(QByteArray response);
 
 public slots:
-    //void OnSubimtClicked();
     void ParseResponse(QNetworkReply* response);
     void failedAuth(QString context);
     void sendLoginRequest();
 };
-

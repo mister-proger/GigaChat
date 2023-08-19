@@ -2,8 +2,6 @@
 
 void Widget::InitializeConnections()
 {
-    qDebug() << __PRETTY_FUNCTION__;
-
     connect(HelloScreen, &Authorizer::successfullyAuthorized,
             this, &Widget::OnAuthentication,
             Qt::DirectConnection);
@@ -23,7 +21,7 @@ Widget::Widget(QWidget *parent)
     EventsAndUI = new QWidget();
     EventsAndUILayout = new QHBoxLayout(EventsAndUI);
     UI = new UserInterface();
-    recentEvents = new QListView();
+    recentEvents = new QListView(); //TODO: IMPLEMENT
     EventsAndUILayout->addWidget(recentEvents, 1);
     EventsAndUILayout->addWidget(UI, 9);
     
@@ -34,20 +32,12 @@ Widget::Widget(QWidget *parent)
 }
 
 Widget::~Widget()
-{
-}
+{}
 
+//TODO: IMPLEMENT
 void Widget::OnAuthentication(QByteArray data)
 {
     AuthorizeControl->setCurrentIndex(1);
-    /*
-    it could have been
-    enum struct ScreenType
-    {
-        AuthorizeScreen = 0,
-        ApplicationScreen = 1
-    };
-    but... enums are not convertible to ints...
-    */
+    DEBUG(data);
 }
 

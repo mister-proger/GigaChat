@@ -12,15 +12,15 @@ void UserInterface::constructWindowArray()
 void UserInterface::constructTabWidget()
 {
     for(const auto& [Icon, Title, Widget] : tabs)
-    {
         addTab(Widget, Icon, Title);
-        qDebug() << Icon << Title << Widget;
-    }
+    setTabPosition(TabPosition::South);
+    setElideMode(Qt::ElideMiddle);
+    
 }
 
 UserInterface::UserInterface(QWidget *parent) : QTabWidget{parent}
 {
     constructWindowArray();
     constructTabWidget();
-    setTabPosition(TabPosition::South);
+    
 }

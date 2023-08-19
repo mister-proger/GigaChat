@@ -6,5 +6,4 @@
 struct Properties
 {
     QString accessToken;
-    
 };
