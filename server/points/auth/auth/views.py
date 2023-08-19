@@ -1,6 +1,7 @@
 import re
 
-from django.http import HttpResponseBadRequest, JsonResponse
+from django.http import JsonResponse
+
 from . import DBOperator
 
 
@@ -72,7 +73,7 @@ def auth(request):
             'description': 'LackOfArguments'
         }, status=400)
 
-    id = DBOperator.operator.check(validate_input(request.GET['login']), request.GET['login'])
+    id = DBOperator.operator.check(validate_input(request.GET['login']), request.GET['login'])[0]
 
     if id is None:
         return JsonResponse({

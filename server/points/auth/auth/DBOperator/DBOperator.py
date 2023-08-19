@@ -6,6 +6,8 @@ except ImportError:
     import generator
 
 
+_password = 'pRN|$jZAKC@XefDBaTxdkQoOWi5VuvbFl~m*U1H0tRsa*oeUDypN@Z#4~xGg@O@F'
+
 connection = psycopg2.connect(host='localhost', port=5432, user='postgres', password=_password)
 
 
@@ -23,7 +25,7 @@ def drop_all_tables():
 # debug
 def check_all_tables():
     with connection.cursor() as cursor:
-        cursor.execute("select * from information_schema.tables WHERE table_schema='public';")
+        cursor.execute("SELECT * FROM information_schema.tables WHERE table_schema='public';")
 
         for table in cursor.fetchall():
             cursor.execute(f"select * from {table[2]}")
@@ -54,20 +56,45 @@ def setup():
     cursor.execute('''
         CREATE TABLE changes (
             id INTEGER PRIMARY KEY,
-            name TIMESTAMP,
-            nickname TIMESTAMP,
-            password TIMESTAMP,
-            avatar TIMESTAMP,
-            FOREIGN KEY (id) REFERENCES users(id)
+            name TIMESTAMP[],
+            nickname TIMESTAMP[],
+            password TIMESTAMP[],
+            avatar TIMESTAMP[],
+            FOREIGN KEY (id) REFERENCES users (id)
         )
     ''')
 
     cursor.execute('''
         CREATE TABLE tokens (
-            id INTEGER PRIMARY KEY,
+            id INTEGER NOT NULL,
             client TEXT NOT NULL,
             token TEXT NOT NULL,
-            FOREIGN KEY (id) REFERENCES users(id)
+            FOREIGN KEY (id) REFERENCES users (id)
+        )
+    ''')
+
+    cursor.execute('''
+        CREATE TABLE channels (
+            id SERIAL PRIMARY KEY,
+            title TEXT,
+            users INTEGER[],
+            roles INTEGER[],
+            guild INTEGER,
+            date TIMESTAMP
+        )
+    ''')
+
+    cursor.execute('''
+        CREATE TABLE messages (
+            id SERIAL PRIMARY KEY,
+            channel INTEGER UNIQUE,
+            sender INTEGER,
+            person INTEGER,
+            t_data TEXT,
+            b_data BYTEA,
+            files TEXT[],
+            date TIMESTAMP,
+            FOREIGN KEY (channel) REFERENCES channels (id)
         )
     ''')
 
