@@ -4,16 +4,21 @@ void Widget::InitializeConnections()
 {
     qDebug() << __PRETTY_FUNCTION__;
 
-    connect(HelloScreen, &Authorizer::AuthenticationComplete,
+    connect(HelloScreen, &Authorizer::successfullyAuthorized,
             this, &Widget::OnAuthentication,
             Qt::DirectConnection);
+}
+
+void Widget::set_server_addres(const QString &newServer_addres)
+{
+    server_addres = newServer_addres;
 }
 
 Widget::Widget(QWidget *parent)
     : QWidget(parent)
 {
     AuthorizeControl = new QStackedLayout(this);
-    HelloScreen = new Authorizer();
+    HelloScreen = new Authorizer(server_addres, this);
     
     EventsAndUI = new QWidget();
     EventsAndUILayout = new QHBoxLayout(EventsAndUI);
@@ -32,9 +37,9 @@ Widget::~Widget()
 {
 }
 
-void Widget::OnAuthentication(bool success)
+void Widget::OnAuthentication(QByteArray data)
 {
-    AuthorizeControl->setCurrentIndex(success);
+    AuthorizeControl->setCurrentIndex(1);
     /*
     it could have been
     enum struct ScreenType

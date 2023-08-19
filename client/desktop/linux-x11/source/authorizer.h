@@ -2,8 +2,15 @@
 
 #include <QObject>
 
+//stdc++
+#include <optional>
+#ifdef QT_DEBUG
+    #include <iostream>
+#endif
+
 //utility classes
 #include <QStringView>
+#include <QByteArray>
 #include <QString>
 #include <QPixmap>
 
@@ -14,7 +21,6 @@
 #include "utils/nonewlineqlineedit.h"
 #include <QWidget>
 #include <QLabel>
-
 
 //layouts
 #include <QHBoxLayout>
@@ -31,6 +37,7 @@
 #include <QNetworkReply>
 #include <QUrl>
 
+
 class Authorizer : public QSvgWidget
 {
     Q_OBJECT
@@ -39,14 +46,15 @@ private:
 
     struct InputField
     {
-        void CreateWidgets(QWidget* parent);
+        QWidget* parent; //stores authorizer's parent
+        
+        void CreateWidgets();
         void SetupLayout();
-        void InitializeConnections(QWidget* parent);
-        explicit InputField(QWidget* parent = nullptr);
+        void InitializeConnections();
+        explicit InputField(QWidget* newParent = nullptr);
         ~InputField();
     
         void Reposition(QRect parentGeometry);
-        bool ParseAuthentication();
     
         QWidget *Widget;
         QGridLayout *Layout;
@@ -57,28 +65,36 @@ private:
         QSvgWidget* SubmitBG;
         QPushButton *Submit,
                     *ChangeCaptcha;
-        QLabel *__SOMETHING__; //that window on the side
+        QLabel *QRLogin; //that window on the side
     };
+    
+    QNetworkAccessManager mgr;
+    
     
     InputField* Field;
     QHBoxLayout* ThisLayout;
     const QString BGImagePath = ":/resources/AuthorizeBG.svg";
-    //QLabel* BackgroundImage;
     static const int resizeFactorH = 2,
                      resizeFactorV = 2;
+    
+    QString server_address;
 
-protected:
+protected:  
     void resizeEvent(QResizeEvent* e) override;
-    //void keyPressEvent(QKeyEvent *event) override;
 
 public:
-    explicit Authorizer(QWidget *parent = nullptr);
-
+    explicit Authorizer(QString server, QWidget* parent = nullptr);
+    
+    
+    void set_server_address(const QString &newServer_address);
+    
 signals:
-    void AuthenticationComplete(bool success);
+    void successfullyAuthorized(QByteArray response);
 
 public slots:
-    void OnSubimtClicked();
-
+    //void OnSubimtClicked();
+    void ParseResponse(QNetworkReply* response);
+    void failedAuth(QString context);
+    void sendLoginRequest();
 };
 

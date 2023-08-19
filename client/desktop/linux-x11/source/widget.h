@@ -4,6 +4,7 @@
 #include "authorizer.h"
 #include "userinterface.h"
 #include "utils/recentevent.h"
+#include "utils/properties.h"
 
 #include <QObject>
 
@@ -29,13 +30,18 @@ private:
     QHBoxLayout* EventsAndUILayout;
 
     void InitializeConnections();
+    
+    QString server_addres = "https://ru.gigachat.com";
+    
 public:
     Widget(QWidget *parent = nullptr);
     ~Widget();
 
-
+    
+    void set_server_addres(const QString &newServer_addres);
+    
 public slots:
-    void OnAuthentication(bool success);
+    void OnAuthentication(QByteArray data);
 
 };
 #endif // WIDGET_H
