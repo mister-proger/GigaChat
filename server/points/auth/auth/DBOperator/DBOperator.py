@@ -54,11 +54,11 @@ def setup():
     cursor.execute('''
         CREATE TABLE changes (
             id INTEGER PRIMARY KEY,
-            name TIMESTAMP,
-            nickname TIMESTAMP,
-            password TIMESTAMP,
-            avatar TIMESTAMP,
-            FOREIGN KEY (id) REFERENCES users(id)
+            name TIMESTAMP[],
+            nickname TIMESTAMP[],
+            password TIMESTAMP[],
+            avatar TIMESTAMP[],
+            FOREIGN KEY (id) REFERENCES users (id)
         )
     ''')
 
@@ -67,7 +67,7 @@ def setup():
             id INTEGER PRIMARY KEY,
             client TEXT NOT NULL,
             token TEXT NOT NULL,
-            FOREIGN KEY (id) REFERENCES users(id)
+            FOREIGN KEY (id) REFERENCES users (id)
         )
     ''')
 
@@ -77,7 +77,8 @@ def setup():
             title TEXT,
             users INTEGER[],
             roles INTEGER[],
-            guild INTEGER
+            guild INTEGER,
+            date TIMESTAMP
         )
     ''')
 
@@ -85,14 +86,15 @@ def setup():
         CREATE TABLE messages (
             id SERIAL PRIMARY KEY,
             channel INTEGER UNIQUE,
-            type TEXT,
+            sender INTEGER,
+            person INTEGER,
             t_data TEXT,
             b_data BYTEA,
             files TEXT[],
-            FOREIGN KEY (channel) REFERENCES channels(id)
+            date TIMESTAMP,
+            FOREIGN KEY (channel) REFERENCES channels (id)
         )
     ''')
-
 
     connection.commit()
 
@@ -155,4 +157,5 @@ def auth_token(token, agent, id):
     return bool(cursor.fetchone())
 
 
+setup()
 check_all_tables()
