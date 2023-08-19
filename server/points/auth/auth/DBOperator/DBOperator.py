@@ -71,6 +71,29 @@ def setup():
         )
     ''')
 
+    cursor.execute('''
+        CREATE TABLE channels (
+            id SERIAL PRIMARY KEY,
+            title TEXT,
+            users INTEGER[],
+            roles INTEGER[],
+            guild INTEGER
+        )
+    ''')
+
+    cursor.execute('''
+        CREATE TABLE messages (
+            id SERIAL PRIMARY KEY,
+            channel INTEGER UNIQUE,
+            type TEXT,
+            t_data TEXT,
+            b_data BYTEA,
+            files TEXT[],
+            FOREIGN KEY (channel) REFERENCES channels(id)
+        )
+    ''')
+
+
     connection.commit()
 
 
@@ -130,3 +153,6 @@ def auth_token(token, agent, id):
     ''', (id, agent, generator.hasher(token)))
 
     return bool(cursor.fetchone())
+
+
+check_all_tables()
