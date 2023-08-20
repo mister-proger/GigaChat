@@ -35,6 +35,14 @@ void Authorizer::InputField::setupLayout()
     layout->addWidget(changeCaptcha, 2, 3, 1, 1);
     layout->addWidget(submitBG,      3, 0, 1, 4);
     layout->addWidget(QRLogin,       0, 4, 4, 3);
+    
+    for(int i = 0; i < layout->columnCount(); ++i)
+    for(int j = 0; j < layout->rowCount(); ++j)
+    {
+        layout->setColumnStretch(i, 1);
+        layout->setRowStretch(j, 1);
+    }
+    
     for(int i = 0; i < layout->count(); ++i)
         layout->itemAt(i)->widget()->setSizePolicy(
                     QSizePolicy::Expanding, 
