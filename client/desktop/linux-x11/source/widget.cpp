@@ -1,43 +1,61 @@
 #include "widget.h"
 
-void Widget::InitializeConnections()
+void Widget::initializeConnections()
 {
-    connect(HelloScreen, &Authorizer::successfullyAuthorized,
-            this, &Widget::OnAuthentication,
+    connect(helloScreen, &Authorizer::successfullyAuthorized,
+            this, &Widget::onAuthentication,
             Qt::DirectConnection);
+}
+//TODO: IMPLEMENT
+void Widget::constructEvents()
+{
+#ifdef QT_DEBUG
+    
+#endif
 }
 
 void Widget::set_server_addres(const QString &newServer_addres)
 {
     server_addres = newServer_addres;
+    helloScreen->set_server_address(newServer_addres);
 }
 
 Widget::Widget(QWidget *parent)
     : QWidget(parent)
 {
-    AuthorizeControl = new QStackedLayout(this);
-    HelloScreen = new Authorizer(server_addres, this);
+    authorizeControl = new QStackedLayout(this);
+    helloScreen = new Authorizer(server_addres, this);
     
-    EventsAndUI = new QWidget();
-    EventsAndUILayout = new QHBoxLayout(EventsAndUI);
+    eventsAndUI = new QWidget();
+    eventsAndUILayout = new QHBoxLayout(eventsAndUI);
     UI = new UserInterface();
-    recentEvents = new QListView(); //TODO: IMPLEMENT
-    EventsAndUILayout->addWidget(recentEvents, 1);
-    EventsAndUILayout->addWidget(UI, 9);
+    recentEvents = new QListWidget();
+    eventsAndUILayout->addWidget(recentEvents, 1);
+    eventsAndUILayout->addWidget(UI, 9);
     
-    AuthorizeControl->addWidget(HelloScreen);
-    AuthorizeControl->addWidget(EventsAndUI);
+    authorizeControl->addWidget(helloScreen);
+    authorizeControl->addWidget(eventsAndUI);
     
-    InitializeConnections();
+    initializeConnections();
 }
 
 Widget::~Widget()
 {}
 
 //TODO: IMPLEMENT
-void Widget::OnAuthentication(QByteArray data)
+void Widget::onAuthentication(QByteArray data)
 {
-    AuthorizeControl->setCurrentIndex(1);
+    authorizeControl->setCurrentIndex(1);
     DEBUG(data);
+}
+
+void Widget::addRecentEvents(QList<RecentEvent *> REList)
+{
+    foreach(RecentEvent* re, REList)
+    {
+        QListWidgetItem* item = new QListWidgetItem();
+        recentEvents->addItem(item);
+        recentEvents->setItemWidget(item, re);
+    }
 }
 

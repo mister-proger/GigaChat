@@ -22,6 +22,6 @@ protected:
     void keyPressEvent(QKeyEvent *e) override;
     
 signals:
-    void EnterPressed();
+    void enterPressed();
 };
 

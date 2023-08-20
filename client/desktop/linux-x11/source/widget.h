@@ -8,10 +8,11 @@
 
 #include <QObject>
 
-#include <QListView>
+#include <QListWidget>
 #include <QWidget>
 
 #include <QStackedLayout>
+#include <QListWidgetItem>
 #include <QHBoxLayout>
 
 class Widget : public QWidget
@@ -19,29 +20,29 @@ class Widget : public QWidget
     Q_OBJECT
 
 private:
-    QStackedLayout* AuthorizeControl;
-
-    Authorizer* HelloScreen;
-    
+    QStackedLayout* authorizeControl;
+    Authorizer* helloScreen;
     UserInterface* UI;
-    QListView* recentEvents;
     
-    QWidget* EventsAndUI;
-    QHBoxLayout* EventsAndUILayout;
-
-    void InitializeConnections();
+    QListWidget* recentEvents;
+    QList<RecentEvent*> eventsList;
+    
+    QWidget* eventsAndUI;
+    QHBoxLayout* eventsAndUILayout;
     
     QString server_addres = "https://ru.gigachat.com";
     
+    void initializeConnections();
+    void constructEvents();
 public:
     Widget(QWidget *parent = nullptr);
     ~Widget();
-
     
     void set_server_addres(const QString &newServer_addres);
     
 public slots:
-    void OnAuthentication(QByteArray data);
+    void onAuthentication(QByteArray data);
+    void addRecentEvents(QList<RecentEvent*> REList);
 
 };
 #endif // WIDGET_H
