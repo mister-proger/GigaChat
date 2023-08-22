@@ -1,172 +1,169 @@
 #include "authorizer.h"
 
-void Authorizer::InputField::CreateWidgets()
+void Authorizer::InputField::createWidgets()
 {
-    qDebug() << __PRETTY_FUNCTION__;
-
-    Widget = new QWidget(parent);
-    QSize parentSize = parent->size();
-    Widget->resize(parentSize.width()/resizeFactorH,
-                   parentSize.height()/resizeFactorV);
-
-    Layout = new QGridLayout(Widget);
-    Username = new NoNewLineQLineEdit(tr("Username goes here,"));
-    Password = new NoNewLineQLineEdit(tr("Password - here..."));
-    Captcha  = new NoNewLineQLineEdit(tr("...and Captcha - here."));
-    ChangeCaptcha = new QPushButton(tr("Change\ncaptcha"));
+    widget = new QWidget(parent);
+    layout   = new QGridLayout(widget);
+    username = new NoNewLineQLineEdit(tr("Username goes here,"));
+    password = new NoNewLineQLineEdit(tr("Password - here..."));
+    captcha  = new NoNewLineQLineEdit(tr("...and Captcha - here."));
+    changeCaptcha = new QPushButton(tr("Change\ncaptcha"));
+    submitBG = new QSvgWidget(":/resources/LoginBN.svg");
+    submit = new QPushButton(tr("Log in"), submitBG);
+    QRLogin = new QLabel(tr("Log in via qr-code\n(temporary unavailable)"));    
     
-    SubmitBG = new QSvgWidget(":/resources/LoginBN.svg");
-    Submit = new QPushButton(tr("Log in"), SubmitBG);
-    Submit->setStyleSheet("background-color: transparent; border: none; color: black;");
-    Submit->setGeometry(SubmitBG->geometry());
-    
-    QRLogin = new QLabel(tr("Log in via qr-code\n(temporary unavailable)"));
+    QHBoxLayout* submitLayout = new QHBoxLayout(submitBG);
+    submitLayout->setContentsMargins(0, 0, 0, 0);
+    submitLayout->addWidget(submit);
+    submit->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);  
     QRLogin->setAutoFillBackground(true);
+    QRLogin->setAlignment(Qt::AlignCenter);
 }
-void Authorizer::InputField::SetupLayout()
+void Authorizer::InputField::setupLayout()
 {
-    qDebug() << __PRETTY_FUNCTION__;
-
-    Layout->addWidget(Username,      0, 0, 1, 4);
-    Layout->addWidget(Password,      1, 0, 1, 4);
-    Layout->addWidget(Captcha,       2, 0, 1, 3);
-    Layout->addWidget(ChangeCaptcha, 2, 3, 1, 1);
-    Layout->addWidget(SubmitBG,      3, 0, 1, 4); //Since SubmitBG is parent of Submit, it is added automatically
-    Layout->addWidget(QRLogin, 0, 4, 4, 3);
-    for(int i = 0; i < Layout->count(); ++i)
-    {
-        //All widgets must take as much space as they can";
-        Layout->itemAt(i)->widget()->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-        qDebug().quote() << Layout->itemAt(i)->widget()->objectName();
+    layout->addWidget(username,      0, 0, 1, 4);
+    layout->addWidget(password,      1, 0, 1, 4);
+    layout->addWidget(captcha,       2, 0, 1, 3);
+    layout->addWidget(changeCaptcha, 2, 3, 1, 1);
+    layout->addWidget(submitBG,      3, 0, 1, 4);
+    layout->addWidget(QRLogin,       0, 4, 4, 3);
     
+    for(int i = 0; i < layout->columnCount(); ++i)
+    for(int j = 0; j < layout->rowCount(); ++j)
+    {
+        layout->setColumnStretch(i, 1);
+        layout->setRowStretch(j, 1);
     }
     
+    for(int i = 0; i < layout->count(); ++i)
+        layout->itemAt(i)->widget()->setSizePolicy(
+                    QSizePolicy::Expanding, 
+                    QSizePolicy::Expanding);
 }
-void Authorizer::InputField::InitializeConnections()
+void Authorizer::InputField::initializeConnections()
 {
-    qDebug() << __PRETTY_FUNCTION__;
-    qDebug().quote() << "\e[96m" << parent /*<< "\e[0m"*/;
-    qDebug().quote() << "DA PARENT \e[0m";
-    
-    connect(Submit  , SIGNAL(clicked())     , parent   , SLOT(sendLoginRequest()), Qt::DirectConnection);
-    connect(Captcha , SIGNAL(EnterPressed()), parent   , SLOT(sendLoginRequest()), Qt::DirectConnection);
-    connect(Username, SIGNAL(EnterPressed()), Password , SLOT(setFocus())        , Qt::DirectConnection);
-    connect(Password, SIGNAL(EnterPressed()), Captcha  , SLOT(setFocus())        , Qt::DirectConnection);
+    connect(submit  , SIGNAL(clicked())     , parent   , SLOT(sendLoginRequest()), Qt::DirectConnection);
+    connect(captcha , SIGNAL(enterPressed()), parent   , SLOT(sendLoginRequest()), Qt::DirectConnection);
+    connect(username, SIGNAL(enterPressed()), password , SLOT(setFocus())        , Qt::DirectConnection);
+    connect(password, SIGNAL(enterPressed()), captcha  , SLOT(setFocus())        , Qt::DirectConnection);
+}
+void Authorizer::InputField::setStyles()
+{
+    submitBG->setStyleSheet(StyleSheets::SVGBGSS);
 }
 Authorizer::InputField::InputField(QWidget* newParent)
     : parent{newParent}
 {
-    // ORDER IS CRUCIAL
-    CreateWidgets();
-    SetupLayout();
-    InitializeConnections();
+    createWidgets();
+    setupLayout();
+    initializeConnections();
+    setStyles();
+    reposition(newParent->geometry());
 }
-
-void Authorizer::InputField::Reposition(QRect parentGeometry)
+void Authorizer::InputField::reposition(QRect parentGeometry)
 {
     int x1 = parentGeometry.height(),
         y1 = parentGeometry.width();
-
     int x2 = x1/resizeFactorV,
         y2 = y1/resizeFactorH;
 
-    Widget->setGeometry( (y1-y2)/2, (x1-x2)/2, y2, x2 );
-    
-    qDebug() << parentGeometry << Widget->geometry() << ' ' << x1 << ' ' << x2 << ' ' << y1 << ' ' << ' ' << y2;
-    
+    widget->setGeometry( (y1-y2)/2, (x1-x2)/2, y2, x2 );
 }
-
 Authorizer::InputField::~InputField()
 {
-    delete Widget;
+    delete widget;
 }
 
 
 Authorizer::Authorizer(QString server, QWidget *parent) 
     : QSvgWidget{parent}, server_address{server} 
 {
-#ifdef QT_DEBUG
-    if(parent == nullptr)
-    {
-        std::cerr << "nullptr passed to authorizer";
-        std::terminate();
-    }
-    qDebug() << this->parent();
-    qDebug() << "THE PARENT";
-    setStyleSheet("border: 5px solid red");
-#endif
-    
-    setMinimumSize(1366, 768); // make minimum size different, this one is way too big
+    setMinimumSize(666, 420);
     load(BGImagePath);
-    Field = new InputField(this);
-    Field->Reposition(geometry());
+    
+    field = new InputField(this);
+    welcomeBack = new QLabel(tr("Welcome back!"), this);
+    welcomeBack->setStyleSheet(StyleSheets::LabelSS);
+    welcomeBack->setMargin(30);
     
     connect(&mgr, &QNetworkAccessManager::finished, 
-            this, &Authorizer::ParseResponse,
+            this, &Authorizer::parseResponse,
             Qt::DirectConnection);
-    
 }
 
 void Authorizer::sendLoginRequest()
 {
-    qDebug() << __PRETTY_FUNCTION__;
-    bool hasAccount = true; //TODO: IMPLEMENT
-    QString requestUrl = 
-            QString("%1/%2?login=%3&password=%4%5")
-            .arg(server_address)
-            .arg(hasAccount ? "auth" : "register")
-            .arg(Field->Username->text())
-            .arg(Field->Password->text())
-            .arg(""); //additional info
     
-    QNetworkRequest authRequest(QUrl(requestUrl));
+    if (field->password->isDefault() || field->username->isDefault())
+    {
+        failedAuth(tr("Error: username and password can't be empty"));
+        return;
+    }
+    
+    QString requestUrl = 
+            QString("%1/auth?login=%2&password=%3%4")
+            .arg(server_address)
+            .arg(field->username->text())
+            .arg(field->password->text())
+            .arg("");
+    
+    QNetworkRequest authRequest = QNetworkRequest(QUrl(requestUrl));
     mgr.get(authRequest);
 }
-void Authorizer::ParseResponse(QNetworkReply* response)
+void Authorizer::parseResponse(QNetworkReply* response)
 {
-    qDebug() << "DATA RECIEVED:\n\e[1;33;40m" << response->readAll() << "\e[0m";
+    DEBUG( "DATA RECIEVED:\n\e[1;33;40m" << response->readAll() << "\e[0m" );
+    
+    bool success;
     
     if(response->error() != QNetworkReply::NoError)
     {
-        qDebug() << "\e[1;33;40mNETWORK ERROR RECIEVED:" 
+        DEBUG( "\e[1;33;40mNETWORK ERROR RECIEVED:" 
                  << response->error() 
-                 << "\e[0m";
+                 << "\e[0m" );
         QString error = tr("Login request failed:\n"
-                           "Error code: ");
-        failedAuth(error + QString::number(response->error()));
+                           "Error code: %1\n%2");
+        failedAuth(error.arg(QString::number(response->error()))
+                        .arg(response->errorString()));
+#ifndef QT_DEBUG
+        return;
+#endif
     }
     
-    bool success = true;
+    success = field->username->text() == "test"; //TODO: IMPLEMENT CHECK
+    
     if (success) emit successfullyAuthorized(response->readAll());
-    else failedAuth(tr("Login incorrect"));
+    else {
+#ifndef QT_DEBUG
+        failedAuth(tr("Login incorrect"))
+#endif
+                ; }
 }
-
-//TODO : Implement
 void Authorizer::failedAuth(QString context)
 {
-    qDebug() << "failedAuth called";
+    if (field->errorMsg != nullptr) goto textset;
+    {
+        setStyleSheet(StyleSheets::FailedAuthSS);
+        QLabel* temp = new QLabel();
+        temp->setWordWrap(true);
+        temp->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        temp->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+        temp->setStyleSheet("color: red; font: bold 12pt");
+        field->layout->addWidget(temp, 4, 0, 1, 7);
+        field->errorMsg = temp; //i'm lazy 
+    }
+
+textset:
+    field->errorMsg->setText(context);
+    
 }
 
 void Authorizer::set_server_address(const QString &newServer_address)
 {
     server_address = newServer_address;
 }
-
 void Authorizer::resizeEvent(QResizeEvent *e)
 {
-    //fucking bullshit
-    /*
-    QSize newSize = e->size();
-    int AspectRatio = (newSize.width() * 36768) / newSize.height();
-    if (AspectRatio < 36768)
-        newSize = QSize(newSize.width(), newSize.width());
-    else if (AspectRatio > 36768*2) 
-        newSize = QSize(newSize.height()*2, newSize.height());
-    
-    qDebug() << newSize;
-    QSvgWidget::resizeEvent(new QResizeEvent(newSize, e->oldSize()));
-    */
     QSvgWidget::resizeEvent(e);
-    qDebug() << "\e[31mresize event triggered\e[0m";
-    Field->Reposition(geometry()); //this->geometry()
+    field->reposition(geometry()); 
 }

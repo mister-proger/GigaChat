@@ -12,8 +12,9 @@ int main(int argc, char *argv[])
     {
         QString server = argv[1];
         w.set_server_addres(server);
+        DEBUG(argv[1]);
     }
-    
+        
     w.show();
     return a.exec();
 }

@@ -6,15 +6,17 @@
 #include <optional>
 #ifdef QT_DEBUG
     #include <iostream>
+    #define DEBUG(str) qDebug() << str
+#else
+    #define DEBUG(str) 
 #endif
 
-//utility classes
 #include <QStringView>
 #include <QByteArray>
 #include <QString>
 #include <QPixmap>
+#include <QDebug>
 
-//widgets
 #include <QPushButton>
 #include <QSvgWidget>
 #include <QLineEdit>
@@ -22,21 +24,19 @@
 #include <QWidget>
 #include <QLabel>
 
-//layouts
 #include <QHBoxLayout>
 #include <QGridLayout>
 #include <QSizePolicy>
 
-//events
 #include <QResizeEvent>
 #include <QKeyEvent>
 
-//network
 #include <QNetworkAccessManager>
 #include <QNetworkRequest>
 #include <QNetworkReply>
 #include <QUrl>
 
+#include "stylesheets.h"
 
 class Authorizer : public QSvgWidget
 {
@@ -46,33 +46,36 @@ private:
 
     struct InputField
     {
-        QWidget* parent; //stores authorizer's parent
+        QWidget* parent; 
         
-        void CreateWidgets();
-        void SetupLayout();
-        void InitializeConnections();
+        void createWidgets();
+        void setupLayout();
+        void initializeConnections();
+        void setStyles();
         explicit InputField(QWidget* newParent = nullptr);
         ~InputField();
     
-        void Reposition(QRect parentGeometry);
+        void reposition(QRect parentGeometry);
     
-        QWidget *Widget;
-        QGridLayout *Layout;
-        //QSizePolicy Alignment;
-        NoNewLineQLineEdit *Username,
-                           *Password,
-                           *Captcha;
-        QSvgWidget* SubmitBG;
-        QPushButton *Submit,
-                    *ChangeCaptcha;
-        QLabel *QRLogin; //that window on the side
+        QWidget *widget;
+        QGridLayout *layout;
+        NoNewLineQLineEdit *username,
+                           *password,
+                           *captcha;
+        QSvgWidget  *submitBG;
+        QPushButton *submit,
+                    *changeCaptcha;
+        QLabel *QRLogin;
+        
+        QLabel* errorMsg = nullptr;
     };
     
     QNetworkAccessManager mgr;
     
+    QLabel* welcomeBack;
     
-    InputField* Field;
-    QHBoxLayout* ThisLayout;
+    InputField* field;
+    QHBoxLayout* thisLayout;
     const QString BGImagePath = ":/resources/AuthorizeBG.svg";
     static const int resizeFactorH = 2,
                      resizeFactorV = 2;
@@ -85,16 +88,13 @@ protected:
 public:
     explicit Authorizer(QString server, QWidget* parent = nullptr);
     
-    
     void set_server_address(const QString &newServer_address);
     
 signals:
     void successfullyAuthorized(QByteArray response);
-
+    
 public slots:
-    //void OnSubimtClicked();
-    void ParseResponse(QNetworkReply* response);
+    void parseResponse(QNetworkReply* response);
     void failedAuth(QString context);
     void sendLoginRequest();
 };
-
