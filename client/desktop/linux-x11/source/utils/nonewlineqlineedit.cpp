@@ -14,7 +14,7 @@ void NoNewLineQLineEdit::keyPressEvent(QKeyEvent *e)
         return;
     }
     
-    if (text() == defaultText) 
+    if (isDefault()) 
     {
         setText("");
         setStyleSheet(changedStyleSheet);

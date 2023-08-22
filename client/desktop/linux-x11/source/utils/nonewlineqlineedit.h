@@ -18,6 +18,11 @@ public:
     const QString defaultStyleSheet = QString("color: #888888"),
                   changedStyleSheet = QString("color: #000000");
     
+    inline bool isDefault()
+    {
+        return defaultText == text();
+    }
+    
 protected:
     void keyPressEvent(QKeyEvent *e) override;
     

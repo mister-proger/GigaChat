@@ -36,6 +36,8 @@
 #include <QNetworkReply>
 #include <QUrl>
 
+#include "stylesheets.h"
+
 class Authorizer : public QSvgWidget
 {
     Q_OBJECT
@@ -64,10 +66,13 @@ private:
         QPushButton *submit,
                     *changeCaptcha;
         QLabel *QRLogin;
+        
+        QLabel* errorMsg = nullptr;
     };
     
     QNetworkAccessManager mgr;
     
+    QLabel* welcomeBack;
     
     InputField* field;
     QHBoxLayout* thisLayout;
@@ -87,7 +92,7 @@ public:
     
 signals:
     void successfullyAuthorized(QByteArray response);
-
+    
 public slots:
     void parseResponse(QNetworkReply* response);
     void failedAuth(QString context);

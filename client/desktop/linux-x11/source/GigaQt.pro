@@ -25,6 +25,7 @@ HEADERS += \
     mainwidgets/gridscrollingwidget.h \
     mainwidgets/scrollingwidget.h \
     mainwidgets/undefinedpage.h \
+    stylesheets.h \
     userinterface.h \
     utils/nonewlineqlineedit.h \
     utils/properties.h \
