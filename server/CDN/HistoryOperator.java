@@ -25,7 +25,7 @@ public class HistoryOperator extends DBOperator {
         stmt.close();
     }
 
-    public static List<HashMap<String, String>> loadHistory () {
+    public static List<HashMap<String, String>> loadHistory (int channel) {
         return null;
     }
 }
