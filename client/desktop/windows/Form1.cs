@@ -78,13 +78,23 @@ namespace GigaChat
             lastPoint = new Point(e.X,e.Y);
         }
         //мозготрах тут:
-        private async void LOGINbuttonReg_Click(object sender, EventArgs e)
+        private void LOGINbuttonReg_Click(object sender, EventArgs e)
         {
             string LOGIN = loginBoxReg.Text;
             string PASSWORD = passwordBoxReg.Text;
-            await HTTP();
+            if (LOGIN == "zodiac_cctv" && PASSWORD == "5656243")
+            {
+                BaseForm baseForm = new BaseForm();
+                this.Hide();
+                baseForm.Show();
+            }
+            else
+            {
+                MessageBox.Show("неправильный логин или пароль");
+            }
+            //await HTTP();
         }
-        private static async Task HTTP()
+        /*private static async Task HTTP()
         {
             // Создаем экземпляр HttpClient
             using (var client = new HttpClient())
@@ -108,6 +118,6 @@ namespace GigaChat
                     MessageBox.Show($"Ошибка при выполнении запроса: {e.Message}");
                 }
             }
-        }
+        }*/
     }
 }

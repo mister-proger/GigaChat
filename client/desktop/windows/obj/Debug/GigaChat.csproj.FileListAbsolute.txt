@@ -8,3 +8,4 @@ E:\download\Git\GigaChat\client\desktop\windows\obj\Debug\GigaChat.csproj.CoreCo
 E:\download\Git\GigaChat\client\desktop\windows\obj\Debug\GigaChat.exe
 E:\download\Git\GigaChat\client\desktop\windows\obj\Debug\GigaChat.pdb
 E:\download\Git\GigaChat\client\desktop\windows\obj\Debug\GigaChat.winRegister.resources
+E:\download\Git\GigaChat\client\desktop\windows\obj\Debug\GigaChat.BaseForm.resources
