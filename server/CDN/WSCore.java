@@ -43,6 +43,9 @@ class WSCore extends WebSocketServer {
     @Override
     public void onMessage (WebSocket webSocket, String s) {
         System.out.println(s);
+        HashMap message = JsonIterator.deserialize(s, HashMap.class);
+        System.out.println(message);
+        System.out.println(PermissionOperator.validateToken(message.get("id").toString(), message.get("token").toString()));
     }
 
     @Override
