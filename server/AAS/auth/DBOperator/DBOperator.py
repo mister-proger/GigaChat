@@ -5,7 +5,6 @@ try:
 except ImportError:
     import generator
 
-
 _password = 'pRN|$jZAKC@XefDBaTxdkQoOWi5VuvbFl~m*U1H0tRsa*oeUDypN@Z#4~xGg@O@F'
 
 connection = psycopg2.connect(host='localhost', port=5432, user='postgres', password=_password)
@@ -67,7 +66,7 @@ def setup():
     cursor.execute('''
         CREATE TABLE tokens (
             id INTEGER NOT NULL,
-            client TEXT NOT NULL,
+            agent TEXT NOT NULL,
             token TEXT NOT NULL,
             FOREIGN KEY (id) REFERENCES users (id)
         )
@@ -130,7 +129,10 @@ def check(login_type, login):
         SELECT id FROM users WHERE {login_type} = %s
     ''', (login,))
 
-    return cursor.fetchone()
+    try:
+        return cursor.fetchone()[0]
+    except TypeError:
+        return None
 
 
 def create_token(agent, id):
@@ -139,7 +141,7 @@ def create_token(agent, id):
     token = generator.gen_token(id)
 
     cursor.execute('''
-        INSERT INTO tokens (id, client, token) VALUES (%s, %s, %s)
+        INSERT INTO tokens (id, agent, token) VALUES (%s, %s, %s)
     ''', (id, agent, generator.hasher(token)))
 
     connection.commit()
