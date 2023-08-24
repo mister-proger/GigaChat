@@ -1,5 +1,7 @@
 
 ## TODO:
+* разработать серверную хэш-функцию
+
 ### ТЕРМИНЫ
 * CDN - Content Delevery Network
 * NCC - No Central Control
