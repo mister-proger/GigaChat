@@ -2,7 +2,7 @@ import re
 
 from django.http import JsonResponse
 
-from . import DBOperator
+from . import helper
 
 
 def validate_input(input_string):
@@ -29,27 +29,48 @@ def register(request):
 
     contact_type = validate_input(request.GET['contact'])
 
-    if contact_type is 'name':
+    if contact_type == 'name':
         return JsonResponse({
             'status': 'refused',
             'reason': 'BadRequest',
             'description': 'NotValidContact'
         }, status=400)
 
-    if DBOperator.operator.check(contact_type, request.GET['contact']):
+    if helper.operator.check('name', request.GET['login']):
+        return JsonResponse({
+            'status': 'refused',
+            'reason': 'BadRequest',
+            'description': 'UsernameAlreadyRegistered'
+        }, status=400)
+
+    if not helper.validator.validate_password(request.GET['password']):
+        return JsonResponse({
+            'status': 'refused',
+            'reason': 'BadRequest',
+            'description': 'BadPassword'
+        }, status=400)
+
+    if not helper.validator.validate_name(request.GET['name']):
+        return JsonResponse({
+            'status': 'refused',
+            'reason': 'BadRequest',
+            'description': 'BadName'
+        }, status=400)
+
+    if helper.operator.check(contact_type, request.GET['contact']):
         return JsonResponse({
             'status': 'refused',
             'reason': 'BadRequest',
             'description': 'ContactAlreadyRegistered'
         }, status=400)
 
-    id = DBOperator.operator.register(
+    id = helper.operator.register(
         request.GET['login'],
         request.GET['password'],
         **{contact_type: request.GET['contact']}
     )
 
-    token = DBOperator.operator.create_token(request.META.get('HTTP_USER_AGENT'), id)
+    token = helper.operator.create_token(request.META.get('HTTP_USER_AGENT'), id)
 
     return JsonResponse({
         'status': 'Done',
@@ -73,7 +94,7 @@ def auth(request):
             'description': 'LackOfArguments'
         }, status=400)
 
-    id = DBOperator.operator.check(validate_input(request.GET['login']), request.GET['login'])
+    id = helper.operator.check(validate_input(request.GET['login']), request.GET['login'])
 
     if id is None:
         return JsonResponse({
@@ -82,7 +103,7 @@ def auth(request):
             'description': 'UserNotFound'
         }, status=400)
 
-    token = DBOperator.operator.create_token(request.META.get('HTTP_USER_AGENT'), id)
+    token = helper.operator.create_token(request.META.get('HTTP_USER_AGENT'), id)
 
     return JsonResponse({
         'status': 'Done',

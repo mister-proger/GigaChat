@@ -149,17 +149,13 @@ def create_token(agent, id):
     return token
 
 
-def auth_token(token, agent, id):
+def auth_token(token, id):
     cursor = connection.cursor()
 
     cursor.execute('''
         SELECT *
         FROM tokens
-        WHERE id = %s AND agent = %s AND token = %s
-    ''', (id, agent, generator.hasher(token)))
+        WHERE id = %s AND token = %s
+    ''', (id, generator.hasher(token)))
 
     return bool(cursor.fetchone())
-
-
-setup()
-check_all_tables()
