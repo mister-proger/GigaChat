@@ -1,0 +1,7 @@
+build*/
+preprint*
+source/compile
+*.user
+*.user*
+*.docx
+*.bak
