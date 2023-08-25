@@ -1,3 +1,9 @@
 public class Message {
-    String data;
+    public Commands type;
+    public int targetChannel;
+    public String data;
+
+    public int messageType () {
+        return type.ordinal();
+    }
 }

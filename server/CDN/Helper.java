@@ -9,12 +9,12 @@ public class Helper {
         String[] pathParts;
         Map<String, String> params;
 
-        public ConnectionPath(String[] pathParts, Map<String, String> params) {
+        public ConnectionPath (String[] pathParts, Map<String, String> params) {
             this.pathParts = pathParts;
             this.params = params;
         }
     }
-    public static ConnectionPath parse(String uri) {
+    public static ConnectionPath parse (String uri) {
         int index = uri.indexOf('?');
         String path = uri.substring(0, index);
         String query = uri.substring(index + 1);
