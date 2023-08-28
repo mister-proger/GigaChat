@@ -250,3 +250,18 @@ def auth_token(id, token):
         return False
     else:
         return generator.Hasher.verify(token, hash.encode())
+
+
+def get_id(username):
+    cursor = connection.cursor()
+
+    cursor.execute('''
+        SELECT id
+        FROM accounts
+        WHERE username = %s
+    ''', (username,))
+
+    try:
+        return cursor.fetchone()[0]
+    except TypeError:
+        return None
