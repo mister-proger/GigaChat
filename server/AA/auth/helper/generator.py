@@ -1,10 +1,17 @@
 import random
 import string
-import hashlib
+
+import bcrypt
 
 
-def hasher(data):
-    return hashlib.sha512(data.encode()).hexdigest()
+class Hasher:
+    @staticmethod
+    def hash(data):
+        return bcrypt.hashpw(data.encode(), bcrypt.gensalt())
+
+    @staticmethod
+    def verify(data, hash):
+        return bcrypt.checkpw(data.encode(), hash)
 
 
 def gen_token(id):
