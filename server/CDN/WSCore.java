@@ -21,10 +21,10 @@ class WSCore extends WebSocketServer {
 
     @Override
     public void onOpen (WebSocket webSocket, ClientHandshake clientHandshake) {
-        Helper.ConnectionPath connectParams = Helper.parse(clientHandshake.getResourceDescriptor());
+        Helper.ConnectionPath connectParams = Helper.parseURI(clientHandshake.getResourceDescriptor());
 
         if (connectParams.params.get("id") != null && connectParams.params.get("token") != null) {
-            if (!(PermissionOperator.validateToken(connectParams.params.get("id"), connectParams.params.get("token")))) {
+            if (!(PermissionOperator.validateToken(Integer.parseInt(connectParams.params.get("id")), connectParams.params.get("token")))) {
                 webSocket.close(401, "InvalidAuthorizationData");
             } else {
                 clients.addClient(new Client(webSocket, Integer.parseInt(connectParams.params.get("id")), connectParams.params.get("token")));
@@ -42,10 +42,7 @@ class WSCore extends WebSocketServer {
 
     @Override
     public void onMessage (WebSocket webSocket, String s) {
-        System.out.println(s);
-        HashMap message = JsonIterator.deserialize(s, HashMap.class);
-        System.out.println(message);
-        System.out.println(PermissionOperator.validateToken(message.get("id").toString(), message.get("token").toString()));
+        // TODO Нужно реализовать систему распознования и обработки сообщений
     }
 
     @Override

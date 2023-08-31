@@ -16,5 +16,5 @@ class Hasher:
 
 def gen_token(id):
     return f'user.{id}.' + ''.join(
-        random.choice(string.ascii_letters + string.digits) for _ in range(251 - len(str(id)))
+        random.choice(string.ascii_letters + string.digits) for _ in range(66 - len(str(id)))
     )

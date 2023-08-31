@@ -1,4 +1,3 @@
-import com.jsoniter.output.JsonStream;
 import org.java_websocket.WebSocket;
 
 public class Client {
@@ -17,8 +16,8 @@ public class Client {
         this.channel = channel;
     }
 
-    public void send (Message data) {
-        sock.send(JsonStream.serialize(data));
+    public void send (String data) {
+        sock.send(data);
     }
 
     public void close (int code, String reason) {

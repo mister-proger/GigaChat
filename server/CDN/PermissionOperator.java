@@ -1,24 +1,30 @@
+import at.favre.lib.crypto.bcrypt.BCrypt;
+
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Arrays;
 
 public class PermissionOperator extends DBOperator {
 
-    public static boolean validateToken (String _id, String token) {
-        int id = Integer.parseInt(_id);
-
-        String sql = "SELECT COUNT(*) FROM tokens WHERE id = ? AND token = ?";
+    public static boolean validateToken (int id, String user_token) {
+        String sql = """
+            SELECT token
+            FROM tokens
+            WHERE account_id = ?
+        """;
         PreparedStatement stmt;
+
         try {
             stmt = conn.prepareStatement(sql);
             stmt.setInt(1, id);
-            stmt.setString(2, Helper.hasher(token));
-            System.out.println(Helper.hasher(token));
+
             ResultSet rs = stmt.executeQuery();
             rs.next();
-            int count = rs.getInt(1);
-            return count > 0;
+
+            return Helper.verifier(user_token, rs.getString(1).getBytes());
         } catch (SQLException e) {
+            System.out.println(e.getMessage());
             return false;
         }
     }
