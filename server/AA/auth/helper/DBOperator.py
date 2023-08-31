@@ -1,3 +1,5 @@
+import datetime
+
 import psycopg2
 
 try:
@@ -38,62 +40,89 @@ def setup():
     cursor = connection.cursor()
 
     cursor.execute('''
-        CREATE TABLE IF NOT EXISTS users (
+        CREATE TABLE accounts (
             id SERIAL PRIMARY KEY,
-            name TEXT UNIQUE,
-            confirmation INTEGER,
-            password TEXT,
+            username TEXT UNIQUE,
+            confirmation INTEGER DEFAULT 1,
+            password TEXT NOT NULL,
             email TEXT UNIQUE,
             emails TEXT[],
-            phone TEXT UNIQUE,
-            nickname TEXT,
-            profile TEXT,
-            avatar BYTEA
+            phone TEXT UNIQUE
         )
     ''')
 
     cursor.execute('''
         CREATE TABLE changes (
-            id INTEGER PRIMARY KEY,
-            name TIMESTAMP[],
+            account_id INTEGER PRIMARY KEY,
             nickname TIMESTAMP[],
             password TIMESTAMP[],
             avatar TIMESTAMP[],
-            FOREIGN KEY (id) REFERENCES users (id)
+            FOREIGN KEY (account_id) REFERENCES accounts (id)
         )
     ''')
 
     cursor.execute('''
         CREATE TABLE tokens (
-            id INTEGER NOT NULL,
+            account_id INTEGER NOT NULL,
             agent TEXT NOT NULL,
             token TEXT NOT NULL,
-            FOREIGN KEY (id) REFERENCES users (id)
+            last_login TIMESTAMP,
+            start TIMESTAMP NOT NULL,
+            ending TIMESTAMP,
+            FOREIGN KEY (account_id) REFERENCES accounts (id)
+        )
+    ''')
+
+    cursor.execute('''
+        CREATE TABLE ttokens (
+            account_id INTEGER NOT NULL,
+            token TEXT NOT NULL,
+            extradition TIMESTAMP NOT NULL,
+            target TEXT NOT NULL,
+            intentions TEXT NOT NULL,
+            comments TEXT[],
+            FOREIGN KEY (account_id) REFERENCES accounts (id)
+        )
+    ''')
+
+    cursor.execute('''
+        CREATE TABLE profiles (
+            account_id INTEGER NOT NULL,
+            username TEXT NOT NULL,
+            nickname TEXT NOT NULL,
+            fast_avatar BYTEA,
+            FOREIGN KEY (account_id) REFERENCES accounts (id),
+            FOREIGN KEY (username) REFERENCES accounts (username)
         )
     ''')
 
     cursor.execute('''
         CREATE TABLE channels (
             id SERIAL PRIMARY KEY,
-            title TEXT,
+            owner INTEGER NOT NULL,
             users INTEGER[],
-            roles INTEGER[],
-            guild INTEGER,
-            date TIMESTAMP
+            rights INTEGER[][],
+            name TEXT NOT NULL,
+            description TEXT NOT NULL,
+            created TIMESTAMP NOT NULL,
+            pinned INTEGER[],
+            FOREIGN KEY (owner) REFERENCES accounts (id)
         )
     ''')
 
     cursor.execute('''
         CREATE TABLE messages (
             id SERIAL PRIMARY KEY,
-            channel INTEGER UNIQUE,
-            sender INTEGER,
-            person INTEGER,
-            t_data TEXT,
-            b_data BYTEA,
-            files TEXT[],
-            date TIMESTAMP,
-            FOREIGN KEY (channel) REFERENCES channels (id)
+            channel INTEGER NOT NULL,
+            author INTEGER NOT NULL,
+            type CHAR(1) NOT NULL,
+            text_content TEXT,
+            bytea_content BYTEA,
+            attachments INTEGER[],
+            shipped TIMESTAMP NOT NULL,
+            forwarded INTEGER,
+            FOREIGN KEY (channel) REFERENCES channels (id),
+            FOREIGN KEY (author) REFERENCES accounts (id)
         )
     ''')
 
@@ -104,35 +133,91 @@ def register(login, password, *, email=None, phone=None):
     cursor = connection.cursor()
 
     cursor.execute('''
-        INSERT INTO users (name, password, email, phone) VALUES (%s, %s, %s, %s)
-    ''', (login, generator.hasher(password), email, phone))
+        INSERT INTO accounts (username, password, email, phone)
+        VALUES (%s, %s, %s, %s)
+    ''', (login, generator.Hasher.hash(password).decode(), email, phone))
 
-    connection.commit()
+    cursor.execute('''
+        SELECT id
+        FROM accounts
+        WHERE username = %s
+    ''', (login,))
 
-    return check('name', login)
+    try:
+        id = cursor.fetchone()[0]
+    except TypeError:
+        return
+    else:
+        cursor.execute('''
+            INSERT INTO changes (account_id, nickname, password)
+            VALUES (%s, %s, %s)
+        ''', (id, [datetime.datetime.now()], [datetime.datetime.now()]))
+
+        connection.commit()
+
+        return id
 
 
 def auth(login_type, login, password):
     cursor = connection.cursor()
 
-    cursor.execute(f'''
-        SELECT password FROM users WHERE {login_type} = %s
-    ''', (login,))
+    match login_type:
+        case 'username':
+            cursor.execute('''
+                SELECT password
+                FROM accounts
+                WHERE username = %s
+            ''', (login,))
+        case 'email':
+            cursor.execute('''
+                SELECT password
+                FROM accounts
+                WHERE email = %s
+            ''', (login,))
+        case 'phone':
+            cursor.execute('''
+                SELECT password
+                FROM accounts
+                WHERE phone = %s
+            ''', (login,))
+        case _:
+            raise ValueError(f'Unknown login type: {login_type}')
 
-    return cursor.fetchone() == generator.hasher(password)
+    try:
+        return generator.Hasher.verify(password, cursor.fetchone()[0].encode())
+    except TypeError:
+        return None
 
 
 def check(login_type, login):
     cursor = connection.cursor()
 
-    cursor.execute(f'''
-        SELECT id FROM users WHERE {login_type} = %s
-    ''', (login,))
+    match login_type:
+        case 'username':
+            cursor.execute('''
+                SELECT id
+                FROM accounts
+                WHERE username = %s
+            ''', (login,))
+        case 'email':
+            cursor.execute('''
+                SELECT id
+                FROM accounts
+                WHERE email = %s
+            ''', (login,))
+        case 'phone':
+            cursor.execute('''
+                SELECT id
+                FROM accounts
+                WHERE phone = %s
+            ''', (login,))
+        case _:
+            raise ValueError(f'Unknown login type: {login_type}')
 
     try:
-        return cursor.fetchone()[0]
+        return bool(cursor.fetchone())
     except TypeError:
-        return None
+        return False
 
 
 def create_token(agent, id):
@@ -141,21 +226,42 @@ def create_token(agent, id):
     token = generator.gen_token(id)
 
     cursor.execute('''
-        INSERT INTO tokens (id, agent, token) VALUES (%s, %s, %s)
-    ''', (id, agent, generator.hasher(token)))
+        INSERT INTO tokens (account_id, agent, token, start)
+        VALUES (%s, %s, %s, %s)
+    ''', (id, agent, generator.Hasher.hash(token).decode(), datetime.datetime.now()))
 
     connection.commit()
 
     return token
 
 
-def auth_token(token, id):
+def auth_token(id, token):
     cursor = connection.cursor()
 
     cursor.execute('''
-        SELECT *
+        SELECT token
         FROM tokens
-        WHERE id = %s AND token = %s
-    ''', (id, generator.hasher(token)))
+        WHERE account_id = %s
+    ''', (id,))
 
-    return bool(cursor.fetchone())
+    try:
+        hash = cursor.fetchone()[0]
+    except TypeError:
+        return False
+    else:
+        return generator.Hasher.verify(token, hash.encode())
+
+
+def get_id(username):
+    cursor = connection.cursor()
+
+    cursor.execute('''
+        SELECT id
+        FROM accounts
+        WHERE username = %s
+    ''', (username,))
+
+    try:
+        return cursor.fetchone()[0]
+    except TypeError:
+        return None

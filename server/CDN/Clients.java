@@ -1,3 +1,4 @@
+import com.jsoniter.output.JsonStream;
 import org.java_websocket.WebSocket;
 
 import java.lang.reflect.Array;
@@ -12,9 +13,11 @@ class Clients {
     }
 
     public void sendCommandToChannel (int channel, Message data) {
+        String message = JsonStream.serialize(data);
+
         clients.parallelStream()
                 .filter(c -> c.getChannel() == channel)
-                .forEach(c -> c.send(data));
+                .forEach(c -> c.send(message));
     }
 
     public void addClient (Client client) {

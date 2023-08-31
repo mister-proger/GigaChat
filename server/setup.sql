@@ -1,49 +1,72 @@
-CREATE TABLE IF NOT EXISTS users (
+CREATE TABLE accounts (
     id SERIAL PRIMARY KEY,
-    name TEXT UNIQUE,
-    confirmation INTEGER,
-    password TEXT,
+    username TEXT UNIQUE,
+    confirmation INTEGER DEFAULT 1,
+    password TEXT NOT NULL,
     email TEXT UNIQUE,
     emails TEXT[],
-    phone TEXT UNIQUE,
-    nickname TEXT,
-    profile TEXT,
-    avatar BYTEA
+    phone TEXT UNIQUE
 )
 
 CREATE TABLE changes (
-    id INTEGER PRIMARY KEY,
-    name TIMESTAMP[],
+    account_id INTEGER PRIMARY KEY,
     nickname TIMESTAMP[],
     password TIMESTAMP[],
     avatar TIMESTAMP[],
-    FOREIGN KEY (id) REFERENCES users (id)
+    FOREIGN KEY (account_id) REFERENCES accounts (id)
 )
 
 CREATE TABLE tokens (
-    id INTEGER NOT NULL,
-    client TEXT NOT NULL,
+    account_id INTEGER NOT NULL,
+    agent TEXT NOT NULL,
     token TEXT NOT NULL,
-    FOREIGN KEY (id) REFERENCES users (id)
+    last_login TIMESTAMP,
+    start TIMESTAMP NOT NULL,
+    ending TIMESTAMP,
+    FOREIGN KEY (account_id) REFERENCES accounts (id)
+)
+
+CREATE TABLE ttokens (
+    account_id INTEGER NOT NULL,
+    token TEXT NOT NULL,
+    extradition TIMESTAMP NOT NULL,
+    target TEXT NOT NULL,
+    intentions TEXT NOT NULL,
+    comments TEXT[],
+    FOREIGN KEY (account_id) REFERENCES accounts (id)
+)
+
+CREATE TABLE profiles (
+    account_id INTEGER NOT NULL,
+    username TEXT NOT NULL,
+    nickname TEXT DEFAULT name,
+    fast_avatar BYTEA,
+    FOREIGN KEY (account_id) REFERENCES accounts (id),
+    FOREIGN KEY (username) REFERENCES accounts (username)
 )
 
 CREATE TABLE channels (
     id SERIAL PRIMARY KEY,
-    title TEXT,
+    owner INTEGER NOT NULL,
     users INTEGER[],
-    roles INTEGER[],
-    guild INTEGER,
-    date TIMESTAMP
+    rights INTEGER[][],
+    name TEXT NOT NULL,
+    description TEXT NOT NULL,
+    created TIMESTAMP NOT NULL,
+    pinned INTEGER[],
+    FOREIGN KEY (owner) REFERENCES accounts (id)
 )
 
 CREATE TABLE messages (
     id SERIAL PRIMARY KEY,
-    channel INTEGER UNIQUE,
-    sender INTEGER,
-    person INTEGER,
-    t_data TEXT,
-    b_data BYTEA,
-    files TEXT[],
-    date TIMESTAMP,
-    FOREIGN KEY (channel) REFERENCES channels (id)
+    channel INTEGER NOT NULL,
+    author INTEGER NOT NULL,
+    type CHAR(1) NOT NULL,
+    text_content TEXT,
+    bytea_content BYTEA,
+    attachments INTEGER[],
+    shipped TIMESTAMP NOT NULL,
+    forwarded INTEGER,
+    FOREIGN KEY (channel) REFERENCES channels (id),
+    FOREIGN KEY (author) REFERENCES accounts (id)
 )
