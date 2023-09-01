@@ -4,9 +4,11 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Diagnostics;
 
 namespace GigaChat
 {
@@ -34,7 +36,7 @@ namespace GigaChat
 
         private void registerReg_Click(object sender, EventArgs e)
         {
-            this.Hide();
+            Process.Start("https://gigachat.fun/");
         }
 
         private void registerReg_MouseHover(object sender, EventArgs e)
@@ -75,5 +77,47 @@ namespace GigaChat
         {
             lastPoint = new Point(e.X,e.Y);
         }
+        //мозготрах тут:
+        private void LOGINbuttonReg_Click(object sender, EventArgs e)
+        {
+            string LOGIN = loginBoxReg.Text;
+            string PASSWORD = passwordBoxReg.Text;
+            if (LOGIN == "zodiac_cctv" && PASSWORD == "5656243")
+            {
+                BaseForm baseForm = new BaseForm();
+                this.Hide();
+                baseForm.Show();
+            }
+            else
+            {
+                MessageBox.Show("неправильный логин или пароль");
+            }
+            //await HTTP();
+        }
+        /*private static async Task HTTP()
+        {
+            // Создаем экземпляр HttpClient
+            using (var client = new HttpClient())
+            {
+                try
+                {
+                    // Отправляем GET-запрос к указанному URL
+                    HttpResponseMessage response = await client.GetAsync("https://google.com");
+
+                    // Убедимся, что запрос успешен (код 200)
+                    response.EnsureSuccessStatusCode();
+
+                    // Читаем содержимое ответа
+                    string responseBody = await response.Content.ReadAsStringAsync();
+
+                    // Выводим содержимое ответа
+                    MessageBox.Show(responseBody);
+                }
+                catch (Exception e)
+                {
+                    MessageBox.Show($"Ошибка при выполнении запроса: {e.Message}");
+                }
+            }
+        }*/
     }
 }

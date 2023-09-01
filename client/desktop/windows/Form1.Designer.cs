@@ -30,6 +30,7 @@ namespace GigaChat
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(winRegister));
             this.WelcomeBackReg = new System.Windows.Forms.Label();
             this.LogInLabelReg = new System.Windows.Forms.Label();
             this.loginBoxReg = new System.Windows.Forms.TextBox();
@@ -122,6 +123,7 @@ namespace GigaChat
             this.LOGINbuttonReg.TabIndex = 7;
             this.LOGINbuttonReg.Text = "войти";
             this.LOGINbuttonReg.UseVisualStyleBackColor = false;
+            this.LOGINbuttonReg.Click += new System.EventHandler(this.LOGINbuttonReg_Click);
             // 
             // passwordVisCheckBox
             // 
@@ -195,6 +197,7 @@ namespace GigaChat
             this.Cursor = System.Windows.Forms.Cursors.Arrow;
             this.ForeColor = System.Drawing.Color.White;
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "winRegister";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "GigaChat --Register";
