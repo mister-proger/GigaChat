@@ -11,5 +11,9 @@
     <orderEntry type="library" name="postgresql-42.6.0" level="project" />
     <orderEntry type="library" name="jsoniter-0.9.23" level="project" />
     <orderEntry type="library" name="slf4j.api" level="project" />
+    <orderEntry type="library" name="at.favre.lib.bcrypt" level="project" />
+    <orderEntry type="library" name="java.websocket.Java.WebSocket" level="project" />
+    <orderEntry type="library" name="jsoniter" level="project" />
+    <orderEntry type="library" name="postgresql" level="project" />
   </component>
 </module>
