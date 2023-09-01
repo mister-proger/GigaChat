@@ -1,9 +1,6 @@
-import at.favre.lib.crypto.bcrypt.BCrypt;
-
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Arrays;
 
 public class PermissionOperator extends DBOperator {
 
@@ -22,9 +19,9 @@ public class PermissionOperator extends DBOperator {
             ResultSet rs = stmt.executeQuery();
             rs.next();
 
-            return Helper.verifier(user_token, rs.getString(1).getBytes());
+            String token = rs.getString(1);
+            return Helper.verifier(user_token, token.getBytes());
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
             return false;
         }
     }

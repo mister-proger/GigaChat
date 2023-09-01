@@ -5,7 +5,7 @@ import java.sql.SQLException;
 public abstract class DBOperator {
     static String url = "jdbc:postgresql://localhost:5432/";
     static String user = "postgres";
-    static String password = "pRN|$jZAKC@XefDBaTxdkQoOWi5VuvbFl~m*U1H0tRsa*oeUDypN@Z#4~xGg@O@F";
+    static String password = "password";
 
     static Connection conn;
     static {

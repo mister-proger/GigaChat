@@ -1,9 +1,7 @@
 import com.jsoniter.output.JsonStream;
 import org.java_websocket.WebSocket;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 class Clients {
     private final ArrayList<Client> clients = new ArrayList<>();
