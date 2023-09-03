@@ -1,5 +1,5 @@
 CREATE TABLE channels (
-    id SERIAL PRIMARY KEY,
+    id BIGSERIAL PRIMARY KEY,
     owner INTEGER NOT NULL,
     users INTEGER[],
     title TEXT NOT NULL,
@@ -10,7 +10,7 @@ CREATE TABLE channels (
 )
 
 CREATE TABLE messages (
-    id SERIAL PRIMARY KEY,
+    id BIGSERIAL PRIMARY KEY,
     channel INTEGER NOT NULL,
     author INTEGER NOT NULL,
     type CHAR(3) NOT NULL,
@@ -25,14 +25,14 @@ CREATE TABLE messages (
 )
 
 CREATE TABLE feeds (
-    id SERIAL PRIMARY KEY,
+    id BIGSERIAL PRIMARY KEY,
     owner INTEGER NOT NULL,
     participants INTEGER[],
     FOREIGN KEY (owner) REFERENCES accounts (id)
 )
 
 CREATE TABLE posts (
-    id SERIAL PRIMARY KEY,
+    id BIGSERIAL PRIMARY KEY,
     feed INTEGER NOT NULL,
     author INTEGER NOT NULL,
     confirmator INTEGER NOT NULL,

@@ -1,5 +1,5 @@
 CREATE TABLE accounts (
-    id SERIAL PRIMARY KEY,
+    id BIGSERIAL PRIMARY KEY,
     username TEXT UNIQUE,
     confirmation INTEGER DEFAULT 0,
     password TEXT NOT NULL,
