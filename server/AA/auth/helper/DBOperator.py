@@ -7,9 +7,7 @@ try:
 except ImportError:
     import generator
 
-_password = 'pRN|$jZAKC@XefDBaTxdkQoOWi5VuvbFl~m*U1H0tRsa*oeUDypN@Z#4~xGg@O@F'
-
-connection = psycopg2.connect(host='localhost', port=5432, user='postgres', password=_password)
+connection = psycopg2.connect(host='localhost', port=5432, user='postgres', password='password')
 
 
 # debug
