@@ -1,0 +1,34 @@
+CREATE TABLE channels.users_{id} (
+    id INTEGER NOT NULL,
+    join TIMESTAMP,
+    left TIMESTAMP,
+    FOREIGN KEY (client) REFERENCES public.accounts (id)
+)
+
+CREATE TABLE channels.messages_{id} (
+    id BIGSERIAL PRIMARY KEY,
+    author INTEGER NOT NULL,
+    type CHAR(8) NOT NULL,
+    text_content TEXT,
+    bytea_content BYTEA,
+    attachments INTEGER[],
+    reply INTEGER,
+    reposting INTEGER[2],
+    user_time TIMESTAMP,
+    server_time TIMESTAMP,
+    FOREIGN KEY (client) REFERENCES public.accounts (id)
+)
+
+CREATE TABLE channels.permissions_{id} (
+    client INTEGER NOT NULL,
+    permission INTEGER NOT NULL,
+    status BOOLEAN,
+    FOREIGN KEY (client) REFERENCES public.accounts (id),
+    FOREIGN KEY (permission) REFERENCES public.permissions (id),
+)
+
+CREATE TABLE channels.logs_{id} (
+    server_time TIMESTAMP,
+    db_time TIMESTAMP DEFAULT now(),
+    data TEXT
+)

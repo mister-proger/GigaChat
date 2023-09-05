@@ -1,0 +1,29 @@
+CREATE TABLE feeds.users_{id} (
+    id INTEGER NOT NULL,
+    join TIMESTAMP,
+    left TIMESTAMP
+)
+
+CREATE TABLE feeds.posts_{id} (
+    author INTEGER NOT NULL,
+    alias INTEGER NOT NULL,
+    anonymous BOOLEAN NOT NULL DEFAULT FALSE,
+    text_content TEXT,
+    attachments INTEGER[],
+    user_time TIMESTAMP,
+    server_time TIMESTAMP,
+    FOREIGN KEY (author) REFERENCES public.accounts (id)
+)
+
+CREATE TABLE feeds.permissions_{id} (
+    client INTEGER NOT NULL,
+    permission INTEGER NOT NULL,
+    status BOOLEAN,
+    FOREIGN KEY (client) REFERENCES feeds.users_{id} (id),
+)
+
+CREATE TABLE feeds.logs_{id} (
+    server_time TIMESTAMP,
+    db_time TIMESTAMP DEFAULT now(),
+    data TEXT
+)
