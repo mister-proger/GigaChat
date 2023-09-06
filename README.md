@@ -1,3 +1,5 @@
+# WE ARE MIGRATING TO https://github.com/GigaChatTeam AND REPOSITORIES ARE NOW SEPARATED
+
 
 ## TODO:
 * разработать серверную хэш-функцию 
