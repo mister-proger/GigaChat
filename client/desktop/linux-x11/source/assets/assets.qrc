@@ -1,8 +1,0 @@
-<RCC>
-    <qresource prefix="/resources">
-        <file>test_image.png</file>
-        <file>AuthorizeBG.svg</file>
-        <file>LoginBN.svg</file>
-    </qresource>
-    <qresource prefix="/"/>
-</RCC>
